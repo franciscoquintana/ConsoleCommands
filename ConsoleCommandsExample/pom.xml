@@ -24,8 +24,13 @@
         <dependency>
             <groupId>net.ddns.fquintana</groupId>
             <artifactId>ConsoleCommands</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.1</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ddns.fquintana</groupId>
+            <artifactId>ConsoleCommands</artifactId>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
 

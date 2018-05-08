@@ -22,7 +22,8 @@ public class HelpCommand extends CommandSingle {
 
             while (Commands.hasNext()) {
                 Command cmd = (Command) Commands.next();
-                cmd.showHelp(console);
+                if (CommandManager.getManager().isAllowed(cmd))
+                    cmd.showHelp(console);
             }
             return true;
         }
@@ -34,7 +35,10 @@ public class HelpCommand extends CommandSingle {
                 console.error("Ese comando no existe");
                 return false;
             }
-            command.showHelp(console);
+            if (CommandManager.getManager().isAllowed(command))
+                command.showHelp(console);
+            else
+                console.error("Ese comando no esta permitido, por lo que no podemos mostrar su ayuda");
             return true;
         }
 
