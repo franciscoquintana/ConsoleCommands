@@ -1,0 +1,55 @@
+package net.ddns.fquintana.ConsoleCommandsExample.Commands;
+
+import net.ddns.fquintana.ConsoleCommands.CommandsCore.CommandMultiple;
+import net.ddns.fquintana.ConsoleCommands.CommandsCore.SubCommand;
+import net.ddns.fquintana.ConsoleCommandsExample.Clases.Alumno;
+import net.ddns.fquintana.ConsoleCommandsExample.Clases.Clase;
+import net.ddns.fquintana.ConsoleCommandsExample.Clases.ClassManager;
+
+public class CreateCommand extends CommandMultiple {
+
+    public CreateCommand() {
+        super("crear", 1);
+        addSub();
+    }
+
+    private void addSub() {
+        SubCommand crearAlumno = new SubCommand("alumno", this, "{nombre} {clase}", "crea un alumno en la clase indicada",2) {
+            @Override
+            public boolean run() {
+                Clase clase = ClassManager.getManager().getClase(args[1]);
+                if (clase != null)
+                {
+                    Alumno alumno = new Alumno(args[0]);
+                    clase.addAlumno(alumno);
+                    console.sendMessage("Alumno añadido con exito");
+                    clase.save();
+                    return true;
+                }
+                console.error("Esa clase no existe");
+                return false;
+            }
+        };
+
+        addSubCommand(crearAlumno);
+
+        SubCommand crearClase = new SubCommand("clase", this, "{nombre}", "crea un alumno en la clase indicada",1) {
+            @Override
+            public boolean run() {
+                boolean exist = ClassManager.getManager().existClase(args[0]);
+
+                if (!exist) {
+                    Clase clase = new Clase(args[0]);
+                    ClassManager.getManager().addClase(clase);
+                    clase.save();
+                    console.sendMessage("La clase " + args[0] + " ha sido añadida con exito");
+                    return true;
+                }
+                console.error("Esa clase ya existe");
+                return false;
+            }
+        };
+
+        addSubCommand(crearClase);
+    }
+}
