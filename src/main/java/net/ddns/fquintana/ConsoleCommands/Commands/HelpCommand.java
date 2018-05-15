@@ -9,11 +9,11 @@ public class HelpCommand extends CommandSingle {
 
 
     public HelpCommand() {
-        super("help","[Comando]","Muestra la ayuda");
+        super("help","[Comando]","Muestra la ayuda",0);
     }
 
     @Override
-    public boolean onCommand(ColoredConsole console, String[] Args) {
+    public boolean run(ColoredConsole console, String[] Args) {
         if (Args.length == 0)
         {
             Collection<Command> Comandos = CommandManager.getManager().getCommands();

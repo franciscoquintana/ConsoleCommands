@@ -6,11 +6,13 @@ public abstract class CommandSingle implements Command {
     private String name;
     private String usage;
     private String desc;
+    private Integer argLength;
 
-    public CommandSingle(String name, String usage, String desc) {
+    public CommandSingle(String name, String usage, String desc, Integer argLength) {
         this.name = name;
         this.usage = usage;
         this.desc = desc;
+        this.argLength = argLength;
     }
 
     @Override
@@ -23,6 +25,20 @@ public abstract class CommandSingle implements Command {
         console.sendMessage(helper());
         console.sendMessage(descr());
     }
+
+    @Override
+    public boolean onCommand(ColoredConsole console, String[] Args) {
+        if(this.argLength <= Args.length) {
+            return this.run(console, Args);
+        }
+
+        console.error ("Uso incorrecto: " +  this.helper());
+
+
+        return true;
+    }
+
+    abstract public boolean run(ColoredConsole console, String[] Args);
 
     public String helper() {
         return ChatColor.GREEN + this.name + " " + this.usage;

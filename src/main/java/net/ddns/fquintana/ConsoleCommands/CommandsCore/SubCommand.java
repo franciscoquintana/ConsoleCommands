@@ -4,8 +4,6 @@ import net.ddns.fquintana.ChatColor;
 
 public abstract class SubCommand
 {
-
-
     public String[] args;
     public String cmdName;
     public Command cmdPrincipal;
