@@ -10,9 +10,5 @@
         <module name="ConsoleCommandsExample" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="ConsoleCommands" target="7" />
-      <module name="ConsoleCommandsExample" target="7" />
-    </bytecodeTargetLevel>
   </component>
 </project>
