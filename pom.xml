@@ -39,7 +39,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>net.ddns.fquintana.main</mainClass>
+                            <mainClass>net.ddns.fquintana.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

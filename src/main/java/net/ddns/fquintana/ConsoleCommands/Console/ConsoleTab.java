@@ -1,8 +1,5 @@
 package net.ddns.fquintana.ConsoleCommands.Console;
 
-import net.ddns.fquintana.main;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,14 +21,14 @@ public class ConsoleTab {
         lastIndex = 0;
     }
 
-    public void tab(ConsoleInputEvent e) {
+    public void tab(StringBuilder b) {
         String str;
         if (string == null)
-            string = e.getCurrentBuffer().toString();
+            string = b.toString();
         else {
             int amount = opciones.get(lastIndex).length() - string.length();
-            main.clear(amount);
-            e.getCurrentBuffer().setLength(e.getCurrentBuffer().length() - amount);
+            //main.clear(amount);
+            b.setLength(b.length() - amount);
         }
         str = string;
 
@@ -43,7 +40,7 @@ public class ConsoleTab {
             {
                 String strAdd = opcion.substring(strCompare.length(), opcion.length());
                 System.out.print(strAdd);
-                e.getCurrentBuffer().append(strAdd);
+                b.append(strAdd);
                 lastIndex = i;
                 return;
             }
