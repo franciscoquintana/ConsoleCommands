@@ -1,6 +1,8 @@
 package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
 import net.ddns.fquintana.ChatColor;
+import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
+import net.ddns.fquintana.ConsoleCommands.Utils.UtilArrays;
 
 import java.util.*;
 
@@ -36,7 +38,7 @@ public class CommandMultiple implements Command{
         }
         if(args.length != 0 && this.getCommands(args[0]) != null) {
             String Args[] = Arrays.copyOfRange(args,1,args.length);
-            this.getCommands(args[0]).processCmd(console, Args);
+            this.getCommands(args[0]).onCommand(console, Args);
         } else {
 
             if (cmds.size() == 0)
@@ -64,6 +66,26 @@ public class CommandMultiple implements Command{
         }
 
         console.sendMessage( ChatColor.GRAY + String.join("", Collections.nCopies(53, "-")));
+    }
+
+    @Override
+    public List<String> getOptions(String[] args) {
+        if (args.length != 0 && this.getCommands(args[0]) != null)
+            return this.getCommands(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
+        if (args.length > 0) {
+            List<String> strings = new ArrayList<>();
+            Iterator Commands = this.cmds.iterator();
+
+            while(Commands.hasNext()) {
+                SubCommand cmd = (SubCommand)Commands.next();
+                String name = cmd.cmdName.toLowerCase();
+                if(name.startsWith(args[0])) {
+                    strings.add(name.toLowerCase());
+                }
+            }
+            return strings;
+        }
+        return new ArrayList<>();
     }
 
     private SubCommand getCommands(String s) {

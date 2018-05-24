@@ -1,6 +1,10 @@
 package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
 import net.ddns.fquintana.ChatColor;
+import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class CommandSingle implements Command {
     private String name;
@@ -46,5 +50,10 @@ public abstract class CommandSingle implements Command {
 
     public String descr() {
         return "   " + this.desc;
+    }
+
+    @Override
+    public List<String> getOptions(String[] args) {
+        return new ArrayList<>();
     }
 }

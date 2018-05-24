@@ -1,8 +1,12 @@
 package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
 import net.ddns.fquintana.ChatColor;
+import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
 
-public abstract class SubCommand
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class SubCommand implements Command
 {
     public String[] args;
     public String cmdName;
@@ -20,7 +24,7 @@ public abstract class SubCommand
         this.argLength = argLength;
     }
 
-    public boolean processCmd(ColoredConsole console, String[] arg) {
+    public boolean onCommand(ColoredConsole console, String[] arg) {
         this.args = arg;
         this.console = console;
 
@@ -37,6 +41,20 @@ public abstract class SubCommand
     public abstract boolean run();
 
 
+    @Override
+    public String getName() {
+        return cmdName;
+    }
+
+    @Override
+    public void showHelp(ColoredConsole console) {
+
+    }
+
+    @Override
+    public List<String> getOptions(String[] args) {
+        return new ArrayList<>();
+    }
 
     public String helper() {
         return ChatColor.GREEN + this.cmdName + " " + this.usage;

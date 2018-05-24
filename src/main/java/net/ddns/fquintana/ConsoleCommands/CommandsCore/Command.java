@@ -1,5 +1,9 @@
 package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
+import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
+
+import java.util.List;
+
 public interface Command {
 
     public String getName();
@@ -7,4 +11,6 @@ public interface Command {
     public boolean onCommand(ColoredConsole console, String[] Args);
 
     public void showHelp(ColoredConsole console);
+
+    List<String> getOptions(String[] args);
 }
