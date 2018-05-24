@@ -1,5 +1,6 @@
 package net.ddns.fquintana.ConsoleCommands.Commands;
 
+import net.ddns.fquintana.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.CommandsCore.*;
 import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
 
@@ -26,6 +27,8 @@ public class HelpCommand extends CommandSingle {
                 if (CommandManager.getManager().isAllowed(cmd))
                     cmd.showHelp(console);
             }
+            console.sendMessage(ChatColor.GOLDB + "Powered By: <fquintana-Commands>");
+            //console.sendMessageB(ChatColor.GOLD + "Powered By: <fquintana-Commands>");
             return true;
         }
         else

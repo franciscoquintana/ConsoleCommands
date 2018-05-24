@@ -6,6 +6,10 @@ import net.ddns.fquintana.ConsoleCommandsExample.Clases.Alumno;
 import net.ddns.fquintana.ConsoleCommandsExample.Clases.Clase;
 import net.ddns.fquintana.ConsoleCommandsExample.Clases.ClassManager;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 public class CreateCommand extends CommandMultiple {
 
     public CreateCommand() {
@@ -28,6 +32,21 @@ public class CreateCommand extends CommandMultiple {
                 }
                 console.error("Esa clase no existe");
                 return false;
+            }
+
+            @Override
+            public List<String> getOptions(String[] args) {
+                if (args.length > 1) {
+                    List<String> clasesFiltradas = new ArrayList<>();
+                    Set<String> clases = ClassManager.getManager().getClases().keySet();
+                    for (String str : clases) {
+                        if (str.startsWith(args[1]))
+                            clasesFiltradas.add(str);
+                    }
+
+                    return clasesFiltradas;
+                }
+                return new ArrayList<>();
             }
         };
 

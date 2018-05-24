@@ -23,4 +23,12 @@ public class ConsoleUtils {
         }
     }
 
+    public static String right(int amount) {
+       return  "\u001B[" + amount + "C";
+    }
+
+    public static String left(int amount) {
+        return  "\u001B[" + amount + "D";
+    }
+
 }

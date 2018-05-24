@@ -7,6 +7,7 @@ public final class CharConstants {
 
     public static final char CHAR_BACKSPACE = '\b';
     public static final String IZQUIERDA = "\u001B[1D";
+    public static final String GOTO_LEFT = "\u001B[1G";
     public static final char CHAR_TAB = '\t';
 
     private CharConstants() {}

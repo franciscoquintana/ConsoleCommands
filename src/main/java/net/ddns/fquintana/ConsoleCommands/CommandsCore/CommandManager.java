@@ -150,12 +150,13 @@ public class CommandManager extends Thread {
                 try {
                     command.onCommand(coloredConsole, Args);
                 } catch (Exception ex) {
-                    coloredConsole.error("Ocurrio un error al ejecutar el comando");
+                    coloredConsole.error("Ocurrio un error no controlado al ejecutar el comando");
+                    coloredConsole.error("El error ha ocurrido en tu app " + ChatColor.BOLD + ChatColor.YELLOW + "Powered By: <fquintana-Commands>");
                 }
             }
             else
             {
-                coloredConsole.sendMessage( ChatColor.CYAN + NombreComando + " comando desconocido, usa help para ver la lista de comandos");
+                coloredConsole.sendMessage( ChatColor.CYAN + "'" + NombreComando + "'" + ChatColor.RED + " comando desconocido, usa help para ver la lista de comandos");
             }
 
         }

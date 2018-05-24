@@ -68,6 +68,7 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
                 return;
             }
         }
+
         //SI SE USA MAL LA API FIX
         if (previous) {
             String opcion = opciones.get(lastIndex - 1).toLowerCase();

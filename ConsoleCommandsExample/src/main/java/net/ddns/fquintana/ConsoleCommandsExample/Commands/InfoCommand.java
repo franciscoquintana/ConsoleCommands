@@ -21,13 +21,13 @@ public class InfoCommand extends CommandMultiple {
             @Override
             public boolean run() {
                 Clase clase = ClassManager.getManager().getClase(args[0]);
-                if (clase != null)
+                //if (clase != null)
                 {
                     Clase.imprimeClase(clase);
                     return true;
                 }
-                console.error("Esa clase no existe");
-                return false;
+                /*console.error("Esa clase no existe");
+                return false;*/
             }
 
             @Override
