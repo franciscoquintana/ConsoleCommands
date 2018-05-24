@@ -1,6 +1,9 @@
 package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
 import net.ddns.fquintana.ChatColor;
+import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
+import net.ddns.fquintana.ConsoleCommands.Console.ConsoleTab;
+import net.ddns.fquintana.ConsoleCommands.Utils.UtilArrays;
 
 import java.util.*;
 
@@ -113,46 +116,71 @@ public class CommandManager extends Thread {
     @Override
     synchronized public void run() {
 
-        Scanner scanner = null;
-        ColoredConsole ColoredConsole = new ColoredConsole();
+        ColoredConsole coloredConsole = new ColoredConsole();
+        ConsoleTab tab = new ConsoleTab() {
+            @Override
+            public List<String> getOptions(String[] args) {
+                return CommandManager.this.getOptions(args);
+            }
+        };
+
+        coloredConsole.getEvents().add(tab);
 
         while (!isClosing())
         {
-            System.out.println(ChatColor.BOLD + ChatColor.GREEN);
-            scanner = new Scanner(System.in);
-            String Input = scanner.nextLine();
+            System.out.print(ChatColor.BOLD + ChatColor.GREEN);
+            String Input = coloredConsole.readLine();
             if (Input.trim().isEmpty())
             {
                 continue;
             }
-            System.out.println(ChatColor.RESET);
             String InputSplitted[] = Input.split(" ");
             String NombreComando = InputSplitted[0];
             String Args[] = Arrays.copyOfRange(InputSplitted,1,InputSplitted.length);
 
+            System.out.print(ChatColor.RESET);
             if (Commands.containsKey(NombreComando.toUpperCase()) )
             {
                 if (isRestricted() && !CommandsValid.contains(NombreComando.toUpperCase()))
                 {
-                    ColoredConsole.error("Ese comando no se puede usar en este momento");
+                    coloredConsole.error("Ese comando no se puede usar en este momento");
                     continue;
                 }
                 Command command = getCommand(NombreComando);
                 try {
-                    command.onCommand(ColoredConsole, Args);
+                    command.onCommand(coloredConsole, Args);
                 } catch (Exception ex) {
-                    ColoredConsole.error("Ocurrio un error al ejecutar el comando");
+                    coloredConsole.error("Ocurrio un error al ejecutar el comando");
                 }
             }
             else
             {
-                ColoredConsole.sendMessage( ChatColor.CYAN + NombreComando + " comando desconocido, usa help para ver la lista de comandos");
+                coloredConsole.sendMessage( ChatColor.CYAN + NombreComando + " comando desconocido, usa help para ver la lista de comandos");
             }
 
         }
-
-        scanner.close();
-
-
     }
+
+    public List<String> getOptions(String[] args) {
+        if (args.length != 0 && this.getCommand(args[0]) != null)
+            return this.getCommand(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
+        if (args.length > 0)
+            return isRestricted() ? CommandsValid : Arrays.asList(Commands.keySet().toArray(new String[0]));
+        /*if (args.length != 0 && this.getCommands(args[0]) != null) {
+            return this.getCommands(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
+        } else {
+            return UtilArrays.filterArray(getOptions(), args[0]);
+        }*/
+        return new ArrayList<>();
+    }
+
+    /*public List<String> getOptions(String[] args) {
+        if (args.length == 0)
+            return new ArrayList<>();
+        if(args.length != 0 && this.getCommands(args[0]) != null) {
+            return this.getCommands(args[0]).getOptions(UtilArrays.removeArgs(args,1));
+        } else {
+            return UtilArrays.filterArray(getOptions(),args[0]);
+        }
+    }*/
 }

@@ -15,7 +15,7 @@ public class Main {
         ClassManager.getManager().load();
 
         CommandManager commandManager = CommandManager.getManager();
-        commandManager.setRestricted(true);
+        commandManager.setRestricted(false);
         commandManager.addCommand(new StopCommand());
         commandManager.addCommand(new HelpCommand());
         commandManager.addCommand(new CreateCommand());

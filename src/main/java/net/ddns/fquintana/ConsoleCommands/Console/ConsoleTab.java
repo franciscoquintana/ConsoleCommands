@@ -1,49 +1,92 @@
 package net.ddns.fquintana.ConsoleCommands.Console;
 
+import net.ddns.fquintana.Main;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class ConsoleTab {
+public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
     private Integer lastIndex = 0;
-    private List<String> opciones;
     private String string = null;
 
     public ConsoleTab(String ...opciones) {
-        this.opciones = Arrays.asList(opciones);
+        //this.opciones = Arrays.asList(opciones);
     }
 
     public String get() {
         return null;
     }
 
-    public void reset() {
+    public void setOpciones(List<String> opciones) {
+        //this.opciones = opciones;
+    }
+
+    public abstract List<String> getOptions(String[] args);
+
+    private void reset() {
         string = null;
         lastIndex = 0;
     }
 
-    public void tab(StringBuilder b) {
+    private void tab(StringBuilder b) {
         String str;
+        boolean previous = false;
         if (string == null)
             string = b.toString();
         else {
-            int amount = opciones.get(lastIndex).length() - string.length();
-            //main.clear(amount);
-            b.setLength(b.length() - amount);
+            previous = true;
         }
         str = string;
 
-        String[] strs = str.split(" ");
-        String strCompare = strs[strs.length - 1];
+
+        List<String> strs = new ArrayList<String>(Arrays.asList(str.split(" ")));
+        if (str.length() != 0 && str.charAt(str.length()-1) == ' ')
+            strs.add("");
+        List<String> opciones = getOptions(strs.toArray(new String[0]));
+        String strCompare = strs.get(strs.size() - 1).toLowerCase();
+
+        /*if (str.length() != 0 && str.charAt(str.length()-1) == ' ')
+            strCompare = "";*/
+
+        if (previous) {
+            int amount = opciones.get(lastIndex-1).length() - strCompare.length();
+            ConsoleUtils.clear(amount);
+            b.setLength(b.length() - amount);
+        }
+
+        if (lastIndex == opciones.size())
+            lastIndex = 0;
+
         for (int i = lastIndex; i < opciones.size(); i++) {
-            String opcion = opciones.get(i);
+            String opcion = opciones.get(i).toLowerCase();
             if (opcion.startsWith(strCompare))
             {
                 String strAdd = opcion.substring(strCompare.length(), opcion.length());
                 System.out.print(strAdd);
                 b.append(strAdd);
-                lastIndex = i;
+                lastIndex = i + 1;
                 return;
             }
         }
+        //SI SE USA MAL LA API FIX
+        if (previous) {
+            String opcion = opciones.get(lastIndex - 1).toLowerCase();
+            String strAdd = opcion.substring(strCompare.length(), opcion.length());
+            System.out.print(strAdd);
+            b.append(strAdd);
+        }
+
+        string = null;
+    }
+
+    @Override
+    public void accept(ConsoleInputEvent consoleInputEvent) {
+        if (consoleInputEvent.getAddedChar() == CharConstants.CHAR_TAB)
+            tab(consoleInputEvent.getCurrentBuffer());
+
+        if (consoleInputEvent.getAddedChar() != CharConstants.CHAR_TAB)
+            reset();
     }
 }

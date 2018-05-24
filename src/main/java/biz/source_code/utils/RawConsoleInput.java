@@ -62,6 +62,13 @@ public static int read (boolean wait) throws IOException {
     else {
       return readUnix(wait); }}
 
+public static void init () throws IOException {
+   if (isWindows)
+      initWindows();
+   else
+      initUnix();
+}
+
 /**
 * Resets console mode to normal line mode with echo.
 *
@@ -129,6 +136,8 @@ private static synchronized void initWindows() throws IOException {
    try {
       consoleHandle = getStdInputHandle();
       originalConsoleMode = getConsoleMode(consoleHandle);
+      Pointer output = getStdOutputHandle();
+      setConsoleMode(output, getConsoleMode(output) | Kernel32Defs.ENABLE_VIRTUAL_TERMINAL_PROCESSING);
       stdinIsConsole = true; }
     catch (IOException e) {
       stdinIsConsole = false; }
@@ -141,6 +150,12 @@ private static Pointer getStdInputHandle() throws IOException {
    if (Pointer.nativeValue(handle) == 0 || Pointer.nativeValue(handle) == Kernel32Defs.INVALID_HANDLE_VALUE) {
       throw new IOException("GetStdHandle(STD_INPUT_HANDLE) failed."); }
    return handle; }
+
+   private static Pointer getStdOutputHandle() throws IOException {
+      Pointer handle = kernel32.GetStdHandle(Kernel32Defs.STD_OUTPUT_HANDLE);
+      if (Pointer.nativeValue(handle) == 0 || Pointer.nativeValue(handle) == Kernel32Defs.INVALID_HANDLE_VALUE) {
+         throw new IOException("GetStdHandle(STD_OUTPUT_HANDLE) failed."); }
+      return handle; }
 
 private static int getConsoleMode (Pointer handle) throws IOException {
    IntByReference mode = new IntByReference();
@@ -160,18 +175,25 @@ private static void resetConsoleModeWindows() throws IOException {
    setConsoleMode(consoleHandle, originalConsoleMode);
    consoleModeAltered = false; }
 
-private static interface Msvcrt extends Library {
+   public static boolean isStdinIsConsole() {
+      return stdinIsConsole;
+   }
+
+   private static interface Msvcrt extends Library {
    int _kbhit();
    int _getwch();
    int getwchar(); }
 
 private static class Kernel32Defs {
    static final int  STD_INPUT_HANDLE       = -10;
+   static final int  STD_OUTPUT_HANDLE       = -11;
    static final long INVALID_HANDLE_VALUE   = (Pointer.SIZE == 8) ? -1 : 0xFFFFFFFFL;
    static final int  ENABLE_PROCESSED_INPUT = 0x0001;
    static final int  ENABLE_LINE_INPUT      = 0x0002;
    static final int  ENABLE_ECHO_INPUT      = 0x0004;
+   static final int  ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
    static final int  ENABLE_WINDOW_INPUT    = 0x0008; }
+
 
 private static interface Kernel32 extends Library {
    int GetConsoleMode (Pointer hConsoleHandle, IntByReference lpMode);
