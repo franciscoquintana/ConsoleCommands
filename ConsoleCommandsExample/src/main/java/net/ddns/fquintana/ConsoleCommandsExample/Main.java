@@ -3,6 +3,7 @@ package net.ddns.fquintana.ConsoleCommandsExample;
 import net.ddns.fquintana.ConsoleCommands.Commands.HelpCommand;
 import net.ddns.fquintana.ConsoleCommands.Commands.StopCommand;
 import net.ddns.fquintana.ConsoleCommands.CommandsCore.CommandManager;
+import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
 import net.ddns.fquintana.ConsoleCommandsExample.Clases.ClassManager;
 import net.ddns.fquintana.ConsoleCommandsExample.Commands.CreateCommand;
 import net.ddns.fquintana.ConsoleCommandsExample.Commands.InfoCommand;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) {
 
+        ColoredConsole coloredConsole = new ColoredConsole();
         ClassManager.getManager().load();
 
         CommandManager commandManager = CommandManager.getManager();
