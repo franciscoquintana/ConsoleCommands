@@ -8,7 +8,7 @@ public interface Command {
 
     public String getName();
 
-    public boolean onCommand(ColoredConsole console, String[] Args);
+    public boolean onCommand(ColoredConsole console, String[] Args) throws ExceptionExtern;
 
     public void showHelp(ColoredConsole console);
 

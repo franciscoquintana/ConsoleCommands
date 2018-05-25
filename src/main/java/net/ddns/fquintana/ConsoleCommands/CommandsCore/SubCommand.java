@@ -24,12 +24,17 @@ public abstract class SubCommand implements Command
         this.argLength = argLength;
     }
 
-    public boolean onCommand(ColoredConsole console, String[] arg) {
+    public boolean onCommand(ColoredConsole console, String[] arg) throws ExceptionExtern {
         this.args = arg;
         this.console = console;
 
         if(this.argLength <= arg.length) {
-            return this.run();
+            try {
+                return this.run();
+            }
+            catch (Exception ex) {
+                throw new ExceptionExtern(ex);
+            }
         }
 
         console.error ("Uso incorrecto: " + cmdPrincipal.getName() + " " + this.helper());

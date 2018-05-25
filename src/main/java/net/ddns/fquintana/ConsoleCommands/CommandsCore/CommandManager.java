@@ -138,7 +138,7 @@ public class CommandManager extends Thread {
             String NombreComando = InputSplitted[0];
             String Args[] = Arrays.copyOfRange(InputSplitted,1,InputSplitted.length);
 
-            System.out.print(ChatColor.RESET);
+            coloredConsole.sendMessage("");
             if (Commands.containsKey(NombreComando.toUpperCase()) )
             {
                 if (isRestricted() && !CommandsValid.contains(NombreComando.toUpperCase()))
@@ -149,9 +149,19 @@ public class CommandManager extends Thread {
                 Command command = getCommand(NombreComando);
                 try {
                     command.onCommand(coloredConsole, Args);
-                } catch (Exception ex) {
+                } catch (ExceptionExtern ex) {
                     coloredConsole.error("Ocurrio un error no controlado al ejecutar el comando");
-                    coloredConsole.error("El error ha ocurrido en tu app " + ChatColor.BOLD + ChatColor.YELLOW + "Powered By: <fquintana-Commands>");
+                    coloredConsole.error("Ha ocurrido el siguiente error en la app " + ChatColor.GRAY + new java.io.File(command.getClass().getProtectionDomain()
+                            .getCodeSource()
+                            .getLocation()
+                            .getPath())
+                            .getName() + ":");
+                    coloredConsole.error(ex);
+                    coloredConsole.sendMessageB(ChatColor.GOLD + "Powered By: <fquintana-Commands>");
+
+                } catch (Exception ex) {
+                    coloredConsole.error("Ocurrio un error, por favor reporte este fallo");
+                    ex.printStackTrace();
                 }
             }
             else

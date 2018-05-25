@@ -2,6 +2,7 @@ package net.ddns.fquintana.ConsoleCommands.Console;
 
 import biz.source_code.utils.RawConsoleInput;
 import net.ddns.fquintana.ChatColor;
+import net.ddns.fquintana.ConsoleCommands.CommandsCore.ExceptionExtern;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +18,16 @@ public class ColoredConsole {
             e.printStackTrace();
         }
         history = new ConsoleHistory(10);
+    }
+
+    public void error(ExceptionExtern ex) {
+        sendMessage("");
+        System.out.print(ChatColor.BOLD + ChatColor.DARK_PURPLE);
+
+        ex.printStackTrace();
+
+        System.out.print(ChatColor.RESET);
+        sendMessage("");
     }
 
     public enum ANSI {DISABLED, READINGBRACKET, READCOMMAND};
@@ -136,7 +147,7 @@ public class ColoredConsole {
                     showHis = true;
                     resetHis = false;
                 }
-                else if (readingAnsi == ANSI.DISABLED){
+                else if (readingAnsi == ANSI.DISABLED && read != 126){
                     if (RawConsoleInput.isStdinIsConsole()) {
                         System.out.print((char) read);
                         String str = b.substring(b.length() + currentDespl, b.length());

@@ -26,7 +26,7 @@ public class CommandMultiple implements Command{
     }
 
     @Override
-    public boolean onCommand(ColoredConsole console, String[] args) {
+    public boolean onCommand(ColoredConsole console, String[] args) throws ExceptionExtern {
         if (args.length < minargs){
             try {
                 throw new NotEnoughArgumentsException();

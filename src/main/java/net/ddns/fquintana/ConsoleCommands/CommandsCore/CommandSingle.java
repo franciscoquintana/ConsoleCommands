@@ -31,9 +31,14 @@ public abstract class CommandSingle implements Command {
     }
 
     @Override
-    public boolean onCommand(ColoredConsole console, String[] Args) {
+    public boolean onCommand(ColoredConsole console, String[] Args) throws ExceptionExtern {
         if(this.argLength <= Args.length) {
-            return this.run(console, Args);
+            try {
+                return this.run(console, Args);
+            }
+            catch (Exception ex) {
+                throw new ExceptionExtern(ex);
+            }
         }
 
         console.error ("Uso incorrecto: " +  this.helper());
