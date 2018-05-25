@@ -168,14 +168,15 @@ public class CommandManager extends Thread {
             {
                 coloredConsole.sendMessage( ChatColor.CYAN + "'" + NombreComando + "'" + ChatColor.RED + " comando desconocido, usa help para ver la lista de comandos");
             }
+            coloredConsole.sendMessage("");
 
         }
     }
 
     public List<String> getOptions(String[] args) {
-        if (args.length != 0 && this.getCommand(args[0]) != null)
+        if (args.length > 1 && this.getCommand(args[0]) != null)
             if (!isRestricted() || isAllowed(args[0]))
-                return this.getCommand(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
+                    return this.getCommand(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
         if (args.length == 1)
             return isRestricted() ? commandsValid : Arrays.asList(commands.keySet().toArray(new String[0]));
 

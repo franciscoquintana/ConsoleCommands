@@ -70,7 +70,7 @@ public class CommandMultiple implements Command{
 
     @Override
     public List<String> getOptions(String[] args) {
-        if (args.length != 0 && this.getCommands(args[0]) != null)
+        if (args.length > 1 && this.getCommands(args[0]) != null)
             return this.getCommands(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
         if (args.length > 0) {
             List<String> strings = new ArrayList<>();
