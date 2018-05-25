@@ -31,7 +31,7 @@ public class ConsoleHistory {
     }
 
     public boolean down() {
-        if (actual != null && actual != commands.size() - 1) {
+        if (actual != null && actual + 1 < commands.size()) {
             actual++;
             return true;
         }
@@ -39,7 +39,7 @@ public class ConsoleHistory {
     }
 
     public void reset() {
-        actual = commands.size()-1;
+        actual = commands.size();
     }
 
     public String undo() {

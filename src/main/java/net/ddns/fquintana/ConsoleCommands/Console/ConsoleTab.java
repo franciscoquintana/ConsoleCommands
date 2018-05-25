@@ -82,10 +82,10 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
 
     @Override
     public void accept(ConsoleInputEvent consoleInputEvent) {
-        if (consoleInputEvent.getAddedChar() == CharConstants.CHAR_TAB)
+        if (consoleInputEvent.getAddedChar() == ConsoleConstants.CHAR_TAB)
             tab(consoleInputEvent.getCurrentBuffer());
 
-        if (consoleInputEvent.getAddedChar() != CharConstants.CHAR_TAB)
+        if (consoleInputEvent.getAddedChar() != ConsoleConstants.CHAR_TAB)
             reset();
     }
 }

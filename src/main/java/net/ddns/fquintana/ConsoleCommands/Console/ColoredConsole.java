@@ -20,18 +20,6 @@ public class ColoredConsole {
         history = new ConsoleHistory(10);
     }
 
-    public void error(ExceptionExtern ex) {
-        sendMessage("");
-        System.out.print(ChatColor.BOLD + ChatColor.DARK_PURPLE);
-
-        ex.printStackTrace();
-
-        System.out.print(ChatColor.RESET);
-        sendMessage("");
-    }
-
-    public enum ANSI {DISABLED, READINGBRACKET, READCOMMAND};
-
     private Integer currentDespl;
     private ConsoleHistory history;
 
@@ -45,141 +33,133 @@ public class ColoredConsole {
         try {
             int read;
             StringBuilder b = new StringBuilder();
+            AnsiReader ansiReader = new AnsiReader();
             boolean terminate = false;
             currentDespl = 0;
             Boolean previousHis = false;
 
-            ANSI readingAnsi = ANSI.DISABLED;
 
             while(!terminate) {
 
                 Boolean showHis = false;
                 Boolean undoHis = false;
                 Boolean resetHis = true;
-                Boolean changeAnsi = false;
 
                 read = RawConsoleInput.read(true);
                 if(read == -1)
-                    read = CharConstants.CHAR_CTRL_D;
+                    read = ConsoleConstants.CHAR_CTRL_D;
                 if(read == '\r')
                     read = '\n';
 
-                if (readingAnsi == ANSI.READINGBRACKET)
-                    if (read != CharConstants.CHAR_LEFTBRACKET)
-                        readingAnsi = ANSI.DISABLED;
-                    else {
-                        readingAnsi = ANSI.READCOMMAND;
-                        changeAnsi = true;
-                    }
+                ansiReader.add((char) read);
 
-                else if (!ConsoleUtils.isPrintableChar((char) read)) {
-                    if(read == CharConstants.CHAR_BACKSPACE || read == 127) {
-                        if (b.length() + currentDespl != 0 ) {
-                            Integer posChar = b.length() - 1 + currentDespl;
-                            if (posChar == b.length() -1)
-                                ConsoleUtils.clear(1);
-                            else {
-                                System.out.print(CharConstants.CHAR_BACKSPACE);
-                                Integer amount = Math.abs(currentDespl) + 1;
+                if (!ansiReader.isReading()){
+                    if (!ConsoleUtils.isPrintableChar((char) read)) {
+                        if(read == ConsoleConstants.CHAR_BACKSPACE || read == 127) {
+                            if (b.length() + currentDespl != 0 ) {
+                                Integer posChar = b.length() - 1 + currentDespl;
+                                if (posChar == b.length() -1)
+                                    ConsoleUtils.clear(1);
+                                else {
+                                    System.out.print(ConsoleConstants.CHAR_BACKSPACE);
+                                    Integer amount = Math.abs(currentDespl) + 1;
+                                    for (int i = 0; i < amount; i++) {
+                                        System.out.print(' ');
+                                    }
+                                    System.out.print(ConsoleUtils.left(amount));
+                                    System.out.print(b.substring(posChar + 1, b.length()));
+                                    System.out.print(ConsoleUtils.left(amount-1));
+                                }
+
+                                b.deleteCharAt(posChar);
+                            }
+                        } else if(read == '\n') {
+                            System.out.print('\n');
+                            terminate = true;
+
+                        } else if(read == ConsoleConstants.CHAR_CTRL_Z) {
+                            undoHis = true;
+                        }
+                    }
+                    //SUPRIMIR
+                    else if (read == 57427 || ansiReader.getResult().equals(ConsoleConstants.SUPR)) {
+                        if (currentDespl < 0) {
+                            Integer posChar = b.length() + currentDespl;
+                            if (posChar == b.length() - 1) {
+                                System.out.print(' ');
+                                System.out.print(ConsoleConstants.CHAR_BACKSPACE);
+                            } else {
+                                Integer amount = Math.abs(currentDespl);
                                 for (int i = 0; i < amount; i++) {
                                     System.out.print(' ');
                                 }
                                 System.out.print(ConsoleUtils.left(amount));
                                 System.out.print(b.substring(posChar + 1, b.length()));
-                                System.out.print(ConsoleUtils.left(amount-1));
+                                System.out.print(ConsoleUtils.left(amount - 1));
                             }
-
                             b.deleteCharAt(posChar);
+                            currentDespl++;
                         }
-                    } else if(read == '\n') {
-                        System.out.print('\n');
-                        terminate = true;
-
-                    } else if(read == CharConstants.CHAR_CTRL_Z) {
-                        undoHis = true;
-                    } else if(read == CharConstants.CHAR_ESC)
-                        readingAnsi = ANSI.READINGBRACKET;
-                }
-                //TODO BROKEN
-                //SUPRIMIR
-                else if (read == 57427 || (readingAnsi == ANSI.READCOMMAND && read == '3')) {
-                    if (currentDespl < 0) {
-                        Integer posChar = b.length() + currentDespl;
-                        if (posChar == b.length() - 1) {
-                            System.out.print(' ');
-                            System.out.print(CharConstants.CHAR_BACKSPACE);
-                        } else {
-                            Integer amount = Math.abs(currentDespl);
-                            for (int i = 0; i < amount; i++) {
-                                System.out.print(' ');
-                            }
-                            System.out.print(ConsoleUtils.left(amount));
-                            System.out.print(b.substring(posChar + 1, b.length()));
-                            System.out.print(ConsoleUtils.left(amount - 1));
-                        }
-                        b.deleteCharAt(posChar);
-                        currentDespl++;
                     }
-                }
-                //IZQUIERDA
-                else if (read == 57419 || (readingAnsi == ANSI.READCOMMAND && read == 'D')) {
+                    //IZQUIERDA
+                    else if (read == 57419 || ansiReader.getResult().equals(ConsoleConstants.IZQUIERDA)) {
                         if (currentDespl > -b.toString().length()) {
                             System.out.print(ConsoleUtils.left(1));
                             currentDespl += -1;
                         }
-                }
-                //DERECHA
-                else if (read == 57421 || (readingAnsi == ANSI.READCOMMAND && read == 'C')) {
-                    if (currentDespl < 0) {
-                        System.out.print(ConsoleUtils.right(1));
-                        currentDespl += 1;
                     }
-                }
-                //ARRIBA
-                else if (read == 57416 || (readingAnsi == ANSI.READCOMMAND && read == 'A')) {
-                    history.up();
-                    showHis = true;
-                    resetHis = false;
-                }
-                //ABAJO
-                else if (read == 57424|| (readingAnsi == ANSI.READCOMMAND && read == 'B')) {
-                    history.down();
-                    showHis = true;
-                    resetHis = false;
-                }
-                else if (readingAnsi == ANSI.DISABLED && read != 126){
-                    if (RawConsoleInput.isStdinIsConsole()) {
-                        System.out.print((char) read);
-                        String str = b.substring(b.length() + currentDespl, b.length());
-                        System.out.print(str);
-                        for (int i = 0; i < str.length(); i++) {
-                            System.out.print(CharConstants.CHAR_BACKSPACE);
+                    //DERECHA
+                    else if (read == 57421 || ansiReader.getResult().equals(ConsoleConstants.DERECHA)) {
+                        if (currentDespl < 0) {
+                            System.out.print(ConsoleUtils.right(1));
+                            currentDespl += 1;
                         }
-
-                        b.insert(b.length() + currentDespl, (char) read);
                     }
-                    else
-                        b.append((char) read);
-
-                }
-
-                if (resetHis && readingAnsi == ANSI.DISABLED)
-                    history.reset();
-
-                if (showHis || undoHis) {
-                    String str = undoHis ? history.undo() : history.get();
-                    if (str != null) {
-                        if (!previousHis)
-                            history.setStrRestore(b.toString());
-                        ConsoleUtils.clear(b.length());
-                        System.out.print(str);
-
-                        b = new StringBuilder(str);
+                    //ARRIBA
+                    else if (read == 57416 || ansiReader.getResult().equals(ConsoleConstants.ARRIBA)) {
+                        history.up();
+                        showHis = true;
+                        resetHis = false;
                     }
-                }
+                    //ABAJO
+                    else if (read == 57424|| ansiReader.getResult().equals(ConsoleConstants.ABAJO)) {
+                        history.down();
+                        showHis = true;
+                        resetHis = false;
+                    }
+                    else {
+                        if (RawConsoleInput.isStdinIsConsole()) {
+                            System.out.print((char) read);
+                            String str = b.substring(b.length() + currentDespl, b.length());
+                            System.out.print(str);
+                            for (int i = 0; i < str.length(); i++) {
+                                System.out.print(ConsoleConstants.CHAR_BACKSPACE);
+                            }
 
-                if (readingAnsi == ANSI.READCOMMAND && !changeAnsi)
-                    readingAnsi = ANSI.DISABLED;
+                            b.insert(b.length() + currentDespl, (char) read);
+                        }
+                        else
+                            b.append((char) read);
+
+                    }
+
+                    if (resetHis)
+                        history.reset();
+
+                    if (showHis || undoHis) {
+                        String str = undoHis ? history.undo() : history.get();
+                        if (str != null) {
+                            if (!previousHis)
+                                history.setStrRestore(b.toString());
+                            ConsoleUtils.clear(b.length());
+                            System.out.print(str);
+
+                            b = new StringBuilder(str);
+                        }
+                    }
+
+                    previousHis = !resetHis;
+                }
 
 
 
@@ -189,9 +169,6 @@ public class ColoredConsole {
                 }
                 if(event.isShouldCancel())
                     terminate = true;
-
-                if (readingAnsi == ANSI.DISABLED)
-                    previousHis = !resetHis;
             }
 
             history.add(b.toString());
@@ -210,6 +187,16 @@ public class ColoredConsole {
     public void error(String string)
     {
         sendMessage(ChatColor.BOLD + ChatColor.RED + string);
+    }
+
+    public void error(ExceptionExtern ex) {
+        sendMessage("");
+        System.out.print(ChatColor.BOLD + ChatColor.DARK_PURPLE);
+
+        ex.printStackTrace();
+
+        System.out.print(ChatColor.RESET);
+        sendMessage("");
     }
 
     public void sendMessageB(String string)

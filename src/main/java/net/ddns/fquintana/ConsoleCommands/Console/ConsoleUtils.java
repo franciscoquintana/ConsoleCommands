@@ -17,9 +17,9 @@ public class ConsoleUtils {
 
     public static void clear(int amount) {
         for (int i=0; i<amount; i++) {
-            System.out.print(CharConstants.CHAR_BACKSPACE);
+            System.out.print(ConsoleConstants.CHAR_BACKSPACE);
             System.out.print(" ");
-            System.out.print(CharConstants.CHAR_BACKSPACE);
+            System.out.print(ConsoleConstants.CHAR_BACKSPACE);
         }
     }
 
