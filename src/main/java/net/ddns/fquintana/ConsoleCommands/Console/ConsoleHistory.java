@@ -8,6 +8,8 @@ public class ConsoleHistory {
     Integer max;
     Integer actual;
 
+    Boolean moveUp = true;
+
     String strRestore;
 
     public ConsoleHistory(Integer max) {
@@ -19,18 +21,24 @@ public class ConsoleHistory {
         if (commands.size() == max)
             commands.remove(0);
         commands.add(str);
-        actual = commands.indexOf(str) + 1;
+        reset();
+        moveUp = false;
     }
 
     public boolean up() {
-        if (actual != null && actual != 0) {
+        if (actual != null && actual - 1 >= 0 && moveUp) {
             actual--;
             return true;
         }
+        if (!moveUp)
+            moveUp = true;
         return false;
     }
 
     public boolean down() {
+        if (!moveUp)
+            moveUp = true;
+
         if (actual != null && actual + 1 < commands.size()) {
             actual++;
             return true;
@@ -39,7 +47,13 @@ public class ConsoleHistory {
     }
 
     public void reset() {
-        actual = commands.size();
+        actual = commands.size() - 1;
+    }
+
+    public void setActualNext() {
+        if (actual != null) {
+            moveUp = false;
+        }
     }
 
     public String undo() {
@@ -53,6 +67,8 @@ public class ConsoleHistory {
 
     public String get() {
         if (actual != null && actual != -2) {
+            if (actual > commands.size() - 1)
+                actual = commands.size() - 1;
             return commands.get(actual);
         }
         return null;

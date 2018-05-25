@@ -9,12 +9,12 @@ import java.util.*;
 
 public class CommandManager extends Thread {
 
-    private HashMap<String,Command> Commands = new HashMap<>();
-    private List<String> CommandsValid = new ArrayList<>();
+    private HashMap<String,Command> commands = new HashMap<>();
+    private List<String> commandsValid = new ArrayList<>();
 
     private static CommandManager cm;
 
-    private boolean Closing = false;
+    private boolean closing = false;
     private boolean restricted = false;
 
     private CommandManager()
@@ -38,18 +38,18 @@ public class CommandManager extends Thread {
     }
 
     public void setClosing(boolean closing) {
-        Closing = closing;
+        this.closing = closing;
     }
 
     public boolean isClosing() {
-        return Closing;
+        return closing;
     }
 
     public boolean addCommand(Command command) {
 
         if (!existCommand(command.getName().toUpperCase()))
         {
-            Commands.put(command.getName().toUpperCase(),command);
+            commands.put(command.getName().toUpperCase(),command);
             return true;
         }
         else
@@ -67,7 +67,7 @@ public class CommandManager extends Thread {
             commandsUpper.add(str.toUpperCase());
         }
         if (!error)
-            CommandsValid = commandsUpper;
+            commandsValid = commandsUpper;
         return !error;
     }
 
@@ -75,7 +75,7 @@ public class CommandManager extends Thread {
 
         if (existCommand(command.toUpperCase()))
         {
-            CommandsValid.add(command.toUpperCase());
+            commandsValid.add(command.toUpperCase());
             return true;
         }
         else
@@ -89,7 +89,7 @@ public class CommandManager extends Thread {
     }
 
     public boolean isAllowed(String command) {
-        if (isRestricted() && !CommandsValid.contains(command.toUpperCase()))
+        if (isRestricted() && !commandsValid.contains(command.toUpperCase()))
             return false;
         return true;
     }
@@ -105,12 +105,12 @@ public class CommandManager extends Thread {
 
     public Collection<Command> getCommands()
     {
-        return Commands.values();
+        return commands.values();
     }
 
     public Command getCommand(String name)
     {
-        return Commands.get(name.toUpperCase());
+        return commands.get(name.toUpperCase());
     }
 
     @Override
@@ -139,9 +139,9 @@ public class CommandManager extends Thread {
             String Args[] = Arrays.copyOfRange(InputSplitted,1,InputSplitted.length);
 
             coloredConsole.sendMessage("");
-            if (Commands.containsKey(NombreComando.toUpperCase()) )
+            if (commands.containsKey(NombreComando.toUpperCase()) )
             {
-                if (isRestricted() && !CommandsValid.contains(NombreComando.toUpperCase()))
+                if (isRestricted() && !commandsValid.contains(NombreComando.toUpperCase()))
                 {
                     coloredConsole.error("Ese comando no se puede usar en este momento");
                     continue;
@@ -157,7 +157,7 @@ public class CommandManager extends Thread {
                             .getPath())
                             .getName() + ":");
                     coloredConsole.error(ex);
-                    coloredConsole.sendMessageB(ChatColor.GOLD + "Powered By: <fquintana-Commands>");
+                    coloredConsole.sendMessageB(ChatColor.GOLD + "Powered By: <fquintana-commands>");
 
                 } catch (Exception ex) {
                     coloredConsole.error("Ocurrio un error, por favor reporte este fallo");
@@ -174,24 +174,12 @@ public class CommandManager extends Thread {
 
     public List<String> getOptions(String[] args) {
         if (args.length != 0 && this.getCommand(args[0]) != null)
-            return this.getCommand(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
-        if (args.length > 0)
-            return isRestricted() ? CommandsValid : Arrays.asList(Commands.keySet().toArray(new String[0]));
-        /*if (args.length != 0 && this.getCommands(args[0]) != null) {
-            return this.getCommands(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
-        } else {
-            return UtilArrays.filterArray(getOptions(), args[0]);
-        }*/
+            if (!isRestricted() || isAllowed(args[0]))
+                return this.getCommand(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
+        if (args.length == 1)
+            return isRestricted() ? commandsValid : Arrays.asList(commands.keySet().toArray(new String[0]));
+
         return new ArrayList<>();
     }
 
-    /*public List<String> getOptions(String[] args) {
-        if (args.length == 0)
-            return new ArrayList<>();
-        if(args.length != 0 && this.getCommands(args[0]) != null) {
-            return this.getCommands(args[0]).getOptions(UtilArrays.removeArgs(args,1));
-        } else {
-            return UtilArrays.filterArray(getOptions(),args[0]);
-        }
-    }*/
 }

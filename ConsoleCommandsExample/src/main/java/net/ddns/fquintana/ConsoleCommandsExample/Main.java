@@ -7,15 +7,14 @@ import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
 import net.ddns.fquintana.ConsoleCommandsExample.Clases.ClassManager;
 import net.ddns.fquintana.ConsoleCommandsExample.Commands.CreateCommand;
 import net.ddns.fquintana.ConsoleCommandsExample.Commands.InfoCommand;
+import net.ddns.fquintana.ConsoleCommandsExample.Commands.RestrictCommand;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-
-        ColoredConsole coloredConsole = new ColoredConsole();
-        /*coloredConsole.sendMessageB("TEST");
-        coloredConsole.sendMessage("TEST");*/
         ClassManager.getManager().load();
 
         CommandManager commandManager = CommandManager.getManager();
@@ -24,11 +23,8 @@ public class Main {
         commandManager.addCommand(new HelpCommand());
         commandManager.addCommand(new CreateCommand());
         commandManager.addCommand(new InfoCommand());
-        /*commandManager.addValidCommand("help");
-        commandManager.addValidCommand("stop");*/
-        ArrayList<String> strings = new ArrayList<>();
-        strings.add("help");
-        strings.add("stop");
+        commandManager.addCommand(new RestrictCommand());
+        List<String> strings = Arrays.asList("help", "info", "restrict");
         commandManager.setValidCommands(strings);
 
         commandManager.start();

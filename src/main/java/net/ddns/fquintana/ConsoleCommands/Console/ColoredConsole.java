@@ -143,8 +143,8 @@ public class ColoredConsole {
 
                     }
 
-                    if (resetHis)
-                        history.reset();
+                    if (previousHis && resetHis)
+                        history.setActualNext();
 
                     if (showHis || undoHis) {
                         String str = undoHis ? history.undo() : history.get();
