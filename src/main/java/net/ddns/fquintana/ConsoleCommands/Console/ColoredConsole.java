@@ -19,6 +19,8 @@ public class ColoredConsole {
         history = new ConsoleHistory(10);
     }
 
+    public enum ANSI {DISABLED, READINGBRACKET, READCOMMAND};
+
     private Integer currentDespl;
     private ConsoleHistory history;
 
@@ -36,19 +38,31 @@ public class ColoredConsole {
             currentDespl = 0;
             Boolean previousHis = false;
 
+            ANSI readingAnsi = ANSI.DISABLED;
+
             while(!terminate) {
 
                 Boolean showHis = false;
                 Boolean undoHis = false;
                 Boolean resetHis = true;
+                Boolean changeAnsi = false;
 
                 read = RawConsoleInput.read(true);
                 if(read == -1)
                     read = CharConstants.CHAR_CTRL_D;
                 if(read == '\r')
                     read = '\n';
-                if (!ConsoleUtils.isPrintableChar((char) read)) {
-                    if(read == CharConstants.CHAR_BACKSPACE) {
+
+                if (readingAnsi == ANSI.READINGBRACKET)
+                    if (read != CharConstants.CHAR_LEFTBRACKET)
+                        readingAnsi = ANSI.DISABLED;
+                    else {
+                        readingAnsi = ANSI.READCOMMAND;
+                        changeAnsi = true;
+                    }
+
+                else if (!ConsoleUtils.isPrintableChar((char) read)) {
+                    if(read == CharConstants.CHAR_BACKSPACE || read == 127) {
                         if (b.length() + currentDespl != 0 ) {
                             Integer posChar = b.length() - 1 + currentDespl;
                             if (posChar == b.length() -1)
@@ -72,10 +86,12 @@ public class ColoredConsole {
 
                     } else if(read == CharConstants.CHAR_CTRL_Z) {
                         undoHis = true;
-                    }
+                    } else if(read == CharConstants.CHAR_ESC)
+                        readingAnsi = ANSI.READINGBRACKET;
                 }
+                //TODO BROKEN
                 //SUPRIMIR
-                else if (read == 57427) {
+                else if (read == 57427 || (readingAnsi == ANSI.READCOMMAND && read == '3')) {
                     if (currentDespl < 0) {
                         Integer posChar = b.length() + currentDespl;
                         if (posChar == b.length() - 1) {
@@ -95,36 +111,34 @@ public class ColoredConsole {
                     }
                 }
                 //IZQUIERDA
-                else if (read == 57419) {
+                else if (read == 57419 || (readingAnsi == ANSI.READCOMMAND && read == 'D')) {
                         if (currentDespl > -b.toString().length()) {
                             System.out.print(ConsoleUtils.left(1));
                             currentDespl += -1;
                         }
                 }
                 //DERECHA
-                else if (read == 57421) {
+                else if (read == 57421 || (readingAnsi == ANSI.READCOMMAND && read == 'C')) {
                     if (currentDespl < 0) {
                         System.out.print(ConsoleUtils.right(1));
                         currentDespl += 1;
                     }
                 }
                 //ARRIBA
-                else if (read == 57416) {
+                else if (read == 57416 || (readingAnsi == ANSI.READCOMMAND && read == 'A')) {
                     history.up();
                     showHis = true;
                     resetHis = false;
                 }
                 //ABAJO
-                else if (read == 57424) {
+                else if (read == 57424|| (readingAnsi == ANSI.READCOMMAND && read == 'B')) {
                     history.down();
                     showHis = true;
                     resetHis = false;
                 }
-                else {
+                else if (readingAnsi == ANSI.DISABLED){
                     if (RawConsoleInput.isStdinIsConsole()) {
                         System.out.print((char) read);
-                        //TODO MEJORAR ES UN POCO CUTRE
-                        //System.out.print(CharConstants.GOTO_LEFT);
                         String str = b.substring(b.length() + currentDespl, b.length());
                         System.out.print(str);
                         for (int i = 0; i < str.length(); i++) {
@@ -138,7 +152,7 @@ public class ColoredConsole {
 
                 }
 
-                if (resetHis)
+                if (resetHis && readingAnsi == ANSI.DISABLED)
                     history.reset();
 
                 if (showHis || undoHis) {
@@ -153,6 +167,11 @@ public class ColoredConsole {
                     }
                 }
 
+                if (readingAnsi == ANSI.READCOMMAND && !changeAnsi)
+                    readingAnsi = ANSI.DISABLED;
+
+
+
                 ConsoleInputEvent event = new ConsoleInputEvent(b, (char) read);
                 for (Consumer<ConsoleInputEvent> consumerEvent : getEvents()){
                     consumerEvent.accept(event);
@@ -160,7 +179,8 @@ public class ColoredConsole {
                 if(event.isShouldCancel())
                     terminate = true;
 
-                previousHis = !resetHis;
+                if (readingAnsi == ANSI.DISABLED)
+                    previousHis = !resetHis;
             }
 
             history.add(b.toString());

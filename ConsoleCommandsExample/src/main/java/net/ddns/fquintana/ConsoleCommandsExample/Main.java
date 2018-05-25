@@ -14,8 +14,8 @@ public class Main {
     public static void main(String[] args) {
 
         ColoredConsole coloredConsole = new ColoredConsole();
-        coloredConsole.sendMessageB("TEST");
-        coloredConsole.sendMessage("TEST");
+        /*coloredConsole.sendMessageB("TEST");
+        coloredConsole.sendMessage("TEST");*/
         ClassManager.getManager().load();
 
         CommandManager commandManager = CommandManager.getManager();
