@@ -43,7 +43,6 @@ public abstract class CommandSingle implements Command {
 
         console.error ("Uso incorrecto: " +  this.helper());
 
-
         return true;
     }
 
@@ -54,7 +53,7 @@ public abstract class CommandSingle implements Command {
     }
 
     public String descr() {
-        return "   " + this.desc;
+        return "   " + ChatColor.GRAY + this.desc;
     }
 
     @Override

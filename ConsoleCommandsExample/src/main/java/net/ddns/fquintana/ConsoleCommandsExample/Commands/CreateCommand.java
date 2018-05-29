@@ -52,7 +52,7 @@ public class CreateCommand extends CommandMultiple {
 
         addSubCommand(crearAlumno);
 
-        SubCommand crearClase = new SubCommand("clase", this, "{nombre}", "crea un alumno en la clase indicada",1) {
+        SubCommand crearClase = new SubCommand("clase", this, "{nombre}", "crea una clase",1) {
             @Override
             public boolean run() {
                 boolean exist = ClassManager.getManager().existClase(args[0]);

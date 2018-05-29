@@ -184,6 +184,11 @@ public class ColoredConsole {
         System.out.println(string + ChatColor.RESET);
     }
 
+    public void write(String string)
+    {
+        System.out.print(string);
+    }
+
     public void error(String string)
     {
         sendMessage(ChatColor.BOLD + ChatColor.RED + string);

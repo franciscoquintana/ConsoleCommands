@@ -65,7 +65,7 @@ public class CommandMultiple implements Command{
             console.sendMessage(cmd.descr());
         }
 
-        console.sendMessage( ChatColor.GRAY + String.join("", Collections.nCopies(53, "-")));
+        console.sendMessage( ChatColor.GRAY + String.join("", Collections.nCopies(24*2+name.length()-1, "-")));
     }
 
     @Override

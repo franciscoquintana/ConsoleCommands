@@ -17,7 +17,18 @@ public class ConsoleHistory {
         this.commands = new ArrayList<>(max);
     }
 
+    private boolean containsCommand(String strCommand) {
+        for (String str : commands) {
+            if (strCommand.equals(str))
+                return true;
+        }
+
+        return false;
+    }
+
     public void add(String str) {
+        if (commands.size() != 0 && str.equals(commands.get(commands.size()-1)))
+            return;
         if (commands.size() == max)
             commands.remove(0);
         commands.add(str);
