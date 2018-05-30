@@ -2,6 +2,7 @@ package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
 import net.ddns.fquintana.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
+import net.ddns.fquintana.ConsoleCommands.Console.ConsoleHistory;
 import net.ddns.fquintana.ConsoleCommands.Console.ConsoleTab;
 import net.ddns.fquintana.ConsoleCommands.Utils.UtilArrays;
 
@@ -9,7 +10,7 @@ import java.util.*;
 
 public class CommandManager extends Thread {
 
-    private HashMap<String,Command> commands = new HashMap<>();
+    private HashMap<String,ICommand> commands = new LinkedHashMap<>();
     private List<String> commandsValid = new ArrayList<>();
 
     private static CommandManager cm;
@@ -45,7 +46,7 @@ public class CommandManager extends Thread {
         return closing;
     }
 
-    public boolean addCommand(Command command) {
+    public boolean addCommand(ICommand command) {
 
         if (!existCommand(command.getName().toUpperCase()))
         {
@@ -84,7 +85,7 @@ public class CommandManager extends Thread {
         }
     }
 
-    public boolean isAllowed(Command command) {
+    public boolean isAllowed(ICommand command) {
         return isAllowed(command.getName());
     }
 
@@ -103,12 +104,12 @@ public class CommandManager extends Thread {
         return false;
     }
 
-    public Collection<Command> getCommands()
+    public Collection<ICommand> getCommands()
     {
         return commands.values();
     }
 
-    public Command getCommand(String name)
+    public ICommand getCommand(String name)
     {
         return commands.get(name.toUpperCase());
     }
@@ -124,7 +125,11 @@ public class CommandManager extends Thread {
             }
         };
 
-        coloredConsole.getEvents().add(tab);
+        ConsoleHistory history = new ConsoleHistory(10);
+
+        coloredConsole.getEventsInput().add(tab);
+        coloredConsole.getEventsInput().add(history.getInputEvent());
+        coloredConsole.getEventsInvoke().add(history.getInvokeEvent());
 
         while (!isClosing())
         {
@@ -146,7 +151,7 @@ public class CommandManager extends Thread {
                     coloredConsole.error("Ese comando no se puede usar en este momento");
                     continue;
                 }
-                Command command = getCommand(NombreComando);
+                ICommand command = getCommand(NombreComando);
                 try {
                     command.onCommand(coloredConsole, Args);
                 } catch (ExceptionExtern ex) {
@@ -182,5 +187,4 @@ public class CommandManager extends Thread {
 
         return new ArrayList<>();
     }
-
 }

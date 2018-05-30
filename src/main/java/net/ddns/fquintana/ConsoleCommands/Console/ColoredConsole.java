@@ -5,6 +5,7 @@ import net.ddns.fquintana.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.CommandsCore.ExceptionExtern;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -17,34 +18,40 @@ public class ColoredConsole {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        history = new ConsoleHistory(10);
     }
 
     private Integer currentDespl;
-    private ConsoleHistory history;
+    
+    private PrintStream out = System.out;
 
-    private List<Consumer<ConsoleInputEvent>> events = new ArrayList<>();
+    public PrintStream getOut() {
+        return out;
+    }
 
-    public List<Consumer<ConsoleInputEvent>> getEvents() {
-        return events;
+    private List<Consumer<ConsoleInputEvent>> eventsInput = new ArrayList<>();
+    private List<Consumer<ConsoleInvokeEvent>> eventsInvoke = new ArrayList<>();
+
+    public List<Consumer<ConsoleInputEvent>> getEventsInput() {
+        return eventsInput;
+    }
+
+    public List<Consumer<ConsoleInvokeEvent>> getEventsInvoke() {
+        return eventsInvoke;
     }
 
     public String readLine() {
+        return readLine(null);
+    }
+
+    public String readLine(Character character) {
         try {
             int read;
             StringBuilder b = new StringBuilder();
             AnsiReader ansiReader = new AnsiReader();
             boolean terminate = false;
             currentDespl = 0;
-            Boolean previousHis = false;
-
 
             while(!terminate) {
-
-                Boolean showHis = false;
-                Boolean undoHis = false;
-                Boolean resetHis = true;
-
                 read = RawConsoleInput.read(true);
                 if(read == -1)
                     read = ConsoleConstants.CHAR_CTRL_D;
@@ -61,24 +68,22 @@ public class ColoredConsole {
                                 if (posChar == b.length() -1)
                                     ConsoleUtils.clear(1);
                                 else {
-                                    System.out.print(ConsoleConstants.CHAR_BACKSPACE);
+                                    getOut().print(ConsoleConstants.CHAR_BACKSPACE);
                                     Integer amount = Math.abs(currentDespl) + 1;
                                     for (int i = 0; i < amount; i++) {
-                                        System.out.print(' ');
+                                        getOut().print(' ');
                                     }
-                                    System.out.print(ConsoleUtils.left(amount));
-                                    System.out.print(b.substring(posChar + 1, b.length()));
-                                    System.out.print(ConsoleUtils.left(amount-1));
+                                    getOut().print(ConsoleUtils.left(amount));
+                                    write(b.substring(posChar + 1, b.length()), character);
+                                    getOut().print(ConsoleUtils.left(amount-1));
                                 }
 
                                 b.deleteCharAt(posChar);
                             }
                         } else if(read == '\n') {
-                            System.out.print('\n');
+                            getOut().print('\n');
                             terminate = true;
 
-                        } else if(read == ConsoleConstants.CHAR_CTRL_Z) {
-                            undoHis = true;
                         }
                     }
                     //SUPRIMIR
@@ -86,16 +91,16 @@ public class ColoredConsole {
                         if (currentDespl < 0) {
                             Integer posChar = b.length() + currentDespl;
                             if (posChar == b.length() - 1) {
-                                System.out.print(' ');
-                                System.out.print(ConsoleConstants.CHAR_BACKSPACE);
+                                getOut().print(' ');
+                                getOut().print(ConsoleConstants.CHAR_BACKSPACE);
                             } else {
                                 Integer amount = Math.abs(currentDespl);
                                 for (int i = 0; i < amount; i++) {
-                                    System.out.print(' ');
+                                    getOut().print(' ');
                                 }
-                                System.out.print(ConsoleUtils.left(amount));
-                                System.out.print(b.substring(posChar + 1, b.length()));
-                                System.out.print(ConsoleUtils.left(amount - 1));
+                                getOut().print(ConsoleUtils.left(amount));
+                                write(b.substring(posChar + 1, b.length()), character);
+                                getOut().print(ConsoleUtils.left(amount - 1));
                             }
                             b.deleteCharAt(posChar);
                             currentDespl++;
@@ -104,36 +109,24 @@ public class ColoredConsole {
                     //IZQUIERDA
                     else if (read == 57419 || ansiReader.getResult().equals(ConsoleConstants.IZQUIERDA)) {
                         if (currentDespl > -b.toString().length()) {
-                            System.out.print(ConsoleUtils.left(1));
+                            getOut().print(ConsoleUtils.left(1));
                             currentDespl += -1;
                         }
                     }
                     //DERECHA
                     else if (read == 57421 || ansiReader.getResult().equals(ConsoleConstants.DERECHA)) {
                         if (currentDespl < 0) {
-                            System.out.print(ConsoleUtils.right(1));
+                            getOut().print(ConsoleUtils.right(1));
                             currentDespl += 1;
                         }
                     }
-                    //ARRIBA
-                    else if (read == 57416 || ansiReader.getResult().equals(ConsoleConstants.ARRIBA)) {
-                        history.up();
-                        showHis = true;
-                        resetHis = false;
-                    }
-                    //ABAJO
-                    else if (read == 57424|| ansiReader.getResult().equals(ConsoleConstants.ABAJO)) {
-                        history.down();
-                        showHis = true;
-                        resetHis = false;
-                    }
-                    else {
+                    else if (ansiReader.getResult().equals("")){
                         if (RawConsoleInput.isStdinIsConsole()) {
-                            System.out.print((char) read);
+                            write(((Character) (char) read).toString(), character);
                             String str = b.substring(b.length() + currentDespl, b.length());
-                            System.out.print(str);
+                            write(str, character);
                             for (int i = 0; i < str.length(); i++) {
-                                System.out.print(ConsoleConstants.CHAR_BACKSPACE);
+                                getOut().print(ConsoleConstants.CHAR_BACKSPACE);
                             }
 
                             b.insert(b.length() + currentDespl, (char) read);
@@ -143,35 +136,19 @@ public class ColoredConsole {
 
                     }
 
-                    if (previousHis && resetHis)
-                        history.setActualNext();
-
-                    if (showHis || undoHis) {
-                        String str = undoHis ? history.undo() : history.get();
-                        if (str != null) {
-                            if (!previousHis)
-                                history.setStrRestore(b.toString());
-                            ConsoleUtils.clear(b.length());
-                            System.out.print(str);
-
-                            b = new StringBuilder(str);
-                        }
+                    ConsoleInputEvent event = new ConsoleInputEvent(b, (char) read, ansiReader);
+                    for (Consumer<ConsoleInputEvent> consumerEvent : getEventsInput()){
+                        consumerEvent.accept(event);
                     }
-
-                    previousHis = !resetHis;
+                    if(event.isShouldCancel())
+                        terminate = true;
                 }
-
-
-
-                ConsoleInputEvent event = new ConsoleInputEvent(b, (char) read);
-                for (Consumer<ConsoleInputEvent> consumerEvent : getEvents()){
-                    consumerEvent.accept(event);
-                }
-                if(event.isShouldCancel())
-                    terminate = true;
             }
 
-            history.add(b.toString());
+            ConsoleInvokeEvent event = new ConsoleInvokeEvent(b);
+            for (Consumer<ConsoleInvokeEvent> consumerEvent : getEventsInvoke()){
+                consumerEvent.accept(event);
+            }
             return b.toString();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -181,12 +158,20 @@ public class ColoredConsole {
 
     public void sendMessage(String string)
     {
-        System.out.println(string + ChatColor.RESET);
+        getOut().println(string + ChatColor.RESET);
     }
 
     public void write(String string)
     {
-        System.out.print(string);
+        getOut().print(string);
+    }
+
+    public void write(String string, Character character)
+    {
+        if (character != null)
+            write(string.replaceAll("(?s).", character.toString()));
+        else
+            write(string);
     }
 
     public void error(String string)
@@ -196,11 +181,11 @@ public class ColoredConsole {
 
     public void error(ExceptionExtern ex) {
         sendMessage("");
-        System.out.print(ChatColor.BOLD + ChatColor.DARK_PURPLE);
+        getOut().print(ChatColor.BOLD + ChatColor.DARK_PURPLE);
 
         ex.printStackTrace();
 
-        System.out.print(ChatColor.RESET);
+        getOut().print(ChatColor.RESET);
         sendMessage("");
     }
 
@@ -208,8 +193,5 @@ public class ColoredConsole {
     {
         sendMessage(ChatColor.BOLD + string);
     }
-
-
-
 
 }

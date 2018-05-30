@@ -4,7 +4,7 @@ import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
 
 import java.util.List;
 
-public interface Command {
+public interface ICommand {
 
     public String getName();
 

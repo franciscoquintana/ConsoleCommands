@@ -6,7 +6,7 @@ import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CommandSingle implements Command {
+public abstract class CommandSingle implements ICommand {
     private String name;
     private String usage;
     private String desc;

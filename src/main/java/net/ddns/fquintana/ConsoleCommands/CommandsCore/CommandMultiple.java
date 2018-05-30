@@ -6,7 +6,7 @@ import net.ddns.fquintana.ConsoleCommands.Utils.UtilArrays;
 
 import java.util.*;
 
-public class CommandMultiple implements Command{
+public class CommandMultiple implements ICommand {
 
     private String name;
     private int minargs;

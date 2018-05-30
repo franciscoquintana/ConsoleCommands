@@ -14,7 +14,7 @@ public class AnsiReader {
     public AnsiReader() {
         this.status = ANSI.DISABLED;
         this.builder = new StringBuilder();
-        ansiCmds = Arrays.asList(ConsoleConstants.IZQUIERDA, ConsoleConstants.DERECHA, ConsoleConstants.ABAJO, ConsoleConstants.ARRIBA, ConsoleConstants.SUPR);
+        ansiCmds = Arrays.asList(ConsoleConstants.IZQUIERDA, ConsoleConstants.DERECHA, ConsoleConstants.ABAJO, ConsoleConstants.ARRIBA, ConsoleConstants.SUPR, ConsoleConstants.INSERT);
     }
 
     public void reset() {

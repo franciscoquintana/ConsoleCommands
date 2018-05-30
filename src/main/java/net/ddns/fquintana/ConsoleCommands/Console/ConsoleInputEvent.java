@@ -2,13 +2,15 @@ package net.ddns.fquintana.ConsoleCommands.Console;
 
 public class ConsoleInputEvent {
     private final StringBuilder currentBuffer;
-    private final char addedChar;
+    private final Character addedChar;
+    private final AnsiReader ansiReader;
 
     private boolean shouldCancel;
 
-    public ConsoleInputEvent(StringBuilder currentBuffer, char addedChar) {
+    public ConsoleInputEvent(StringBuilder currentBuffer, Character addedChar, AnsiReader ansiReader) {
         this.currentBuffer = currentBuffer;
         this.addedChar = addedChar;
+        this.ansiReader = ansiReader;
     }
 
     public StringBuilder getCurrentBuffer() {
@@ -17,6 +19,10 @@ public class ConsoleInputEvent {
 
     public char getAddedChar() {
         return addedChar;
+    }
+
+    public AnsiReader getAnsiReader() {
+        return ansiReader;
     }
 
     public void clearBuffer() {

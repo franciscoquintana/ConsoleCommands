@@ -18,12 +18,12 @@ public class HelpCommand extends CommandSingle {
     public boolean run(ColoredConsole console, String[] Args) {
         if (Args.length == 0)
         {
-            Collection<Command> Comandos = CommandManager.getManager().getCommands();
+            Collection<ICommand> Comandos = CommandManager.getManager().getCommands();
 
             Iterator Commands = Comandos.iterator();
 
             while (Commands.hasNext()) {
-                Command cmd = (Command) Commands.next();
+                ICommand cmd = (ICommand) Commands.next();
                 if (CommandManager.getManager().isAllowed(cmd))
                     cmd.showHelp(console);
             }
@@ -32,7 +32,7 @@ public class HelpCommand extends CommandSingle {
         }
         else
         {
-            Command command = CommandManager.getManager().getCommand(Args[0]);
+            ICommand command = CommandManager.getManager().getCommand(Args[0]);
             if (command == null)
             {
                 console.error("Ese comando no existe");

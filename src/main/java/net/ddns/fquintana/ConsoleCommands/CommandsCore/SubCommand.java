@@ -6,17 +6,17 @@ import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class SubCommand implements Command
+public abstract class SubCommand implements ICommand
 {
     public String[] args;
     public String cmdName;
-    public Command cmdPrincipal;
+    public ICommand cmdPrincipal;
     public int argLength = 0;
     public String usage = "";
     public String desc = "";
     public ColoredConsole console;
 
-    public SubCommand(String cmdName, Command cmdPrincipal, String usage, String desc, int argLength) {
+    public SubCommand(String cmdName, ICommand cmdPrincipal, String usage, String desc, int argLength) {
         this.cmdName = cmdName;
         this.cmdPrincipal = cmdPrincipal;
         this.usage = usage;
