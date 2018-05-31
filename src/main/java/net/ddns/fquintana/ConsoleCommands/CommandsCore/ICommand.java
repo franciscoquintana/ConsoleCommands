@@ -8,6 +8,8 @@ public interface ICommand {
 
     public String getName();
 
+    void setParent(CommandMultiple multiple);
+
     public boolean onCommand(ColoredConsole console, String[] Args) throws ExceptionExtern;
 
     public void showHelp(ColoredConsole console);

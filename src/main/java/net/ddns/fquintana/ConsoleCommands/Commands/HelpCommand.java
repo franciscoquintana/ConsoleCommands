@@ -38,8 +38,8 @@ public class HelpCommand extends CommandSingle {
 
 
     @Override
-    public boolean run(ColoredConsole console, String[] Args) {
-        if (Args.length == 0)
+    public boolean run(ColoredConsole console, String[] args) {
+        if (args.length == 0)
         {
             Collection<ICommand> Comandos = CommandManager.getManager().getCommands();
 
@@ -55,8 +55,8 @@ public class HelpCommand extends CommandSingle {
         }
         else
         {
-            ICommand command = CommandManager.getManager().getCommand(Args[0]);
-            return showHelp(console, command, UtilArrays.removeArgs(Args, 1));
+            ICommand command = CommandManager.getManager().getCommand(args[0]);
+            return showHelp(console, command, UtilArrays.removeArgs(args, 1));
         }
     }
 

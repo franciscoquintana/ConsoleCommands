@@ -1,7 +1,8 @@
 package net.ddns.fquintana.ConsoleCommandsExample.Commands;
 
 import net.ddns.fquintana.ConsoleCommands.CommandsCore.CommandMultiple;
-import net.ddns.fquintana.ConsoleCommands.CommandsCore.SubCommand;
+import net.ddns.fquintana.ConsoleCommands.CommandsCore.CommandSingle;
+import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
 import net.ddns.fquintana.ConsoleCommandsExample.Clases.Alumno;
 import net.ddns.fquintana.ConsoleCommandsExample.Clases.Clase;
 import net.ddns.fquintana.ConsoleCommandsExample.Clases.ClassManager;
@@ -13,14 +14,14 @@ import java.util.Set;
 public class CreateCommand extends CommandMultiple {
 
     public CreateCommand() {
-        super("crear", 1);
+        super("crear");
         addSub();
     }
 
     private void addSub() {
-        SubCommand crearAlumno = new SubCommand("alumno", this, "{nombre} {clase}", "crea un alumno en la clase indicada",2) {
+        CommandSingle crearAlumno = new CommandSingle("alumno", "{nombre} {clase}", "crea un alumno en la clase indicada",2) {
             @Override
-            public boolean run() {
+            public boolean run(ColoredConsole console, String[] args) {
                 Clase clase = ClassManager.getManager().getClase(args[1]);
                 if (clase != null)
                 {
@@ -52,9 +53,9 @@ public class CreateCommand extends CommandMultiple {
 
         addSubCommand(crearAlumno);
 
-        SubCommand crearClase = new SubCommand("clase", this, "{nombre}", "crea una clase",1) {
+        CommandSingle crearClase = new CommandSingle("clase", "{nombre}", "crea una clase",1) {
             @Override
-            public boolean run() {
+            public boolean run(ColoredConsole console, String[] args) {
                 boolean exist = ClassManager.getManager().existClase(args[0]);
 
                 if (!exist) {

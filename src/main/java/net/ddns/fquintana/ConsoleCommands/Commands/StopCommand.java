@@ -11,7 +11,7 @@ public class StopCommand extends CommandSingle {
     }
 
     @Override
-    public boolean run(ColoredConsole console, String[] Args) {
+    public boolean run(ColoredConsole console, String[] args) {
         console.sendMessage("Cerrando.");
         CommandManager.getManager().setClosing(true);
         return true;

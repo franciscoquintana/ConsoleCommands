@@ -9,16 +9,23 @@ import java.util.*;
 public class CommandMultiple implements ICommand {
 
     private String name;
-    private int minargs;
+    private int minargs = 1;
+    private CommandMultiple parentCmd = null;
 
     private List<ICommand> cmds = new ArrayList();
 
-    public CommandMultiple(String name, int minargs) {
+    public CommandMultiple(String name) {
         this.name = name;
-        this.minargs = minargs;
     }
 
+    @Override
+    public void setParent(CommandMultiple multiple) {
+        parentCmd = multiple;
+    }
 
+    public boolean isSubCommand() {
+        return parentCmd != null;
+    }
 
     @Override
     public String getName() {
@@ -57,14 +64,23 @@ public class CommandMultiple implements ICommand {
     {
         Iterator Commands = this.cmds.iterator();
 
-        console.sendMessage(ChatColor.GRAY + "---------------------- [" + ChatColor.DARK_PURPLE + name.toUpperCase() + ChatColor.GRAY + "] ---------------------");
+        if (!isSubCommand())
+            console.sendMessage(ChatColor.GRAY + "---------------------- [" + ChatColor.DARK_PURPLE + name.toUpperCase() + ChatColor.GRAY + "] ---------------------");
+        else
+            console.sendMessage(ChatColor.YELLOW + name.toUpperCase());
 
         while(Commands.hasNext()) {
-            SubCommand cmd = (SubCommand) Commands.next();
+            ICommand cmd = (ICommand) Commands.next();
             cmd.showHelp(console);
         }
 
-        console.sendMessage( ChatColor.GRAY + String.join("", Collections.nCopies(24*2+name.length()-1, "-")));
+        if (isSubCommand())
+            console.sendMessage( ChatColor.GRAY + String.join("", Collections.nCopies(24*2+name.length()-1, "-")));
+    }
+
+    public String helper() {
+        String helper = isSubCommand() ? parentCmd.helper() : "";
+        return helper + ChatColor.GREEN + this.name + " ";
     }
 
     @Override
@@ -76,8 +92,8 @@ public class CommandMultiple implements ICommand {
             Iterator Commands = this.cmds.iterator();
 
             while(Commands.hasNext()) {
-                SubCommand cmd = (SubCommand)Commands.next();
-                String name = cmd.cmdName.toLowerCase();
+                ICommand cmd = (ICommand) Commands.next();
+                String name = cmd.getName().toLowerCase();
                 if(name.startsWith(args[0])) {
                     strings.add(name.toLowerCase());
                 }
@@ -91,23 +107,19 @@ public class CommandMultiple implements ICommand {
         Iterator Commands = this.cmds.iterator();
 
         while(Commands.hasNext()) {
-            SubCommand cmd = (SubCommand)Commands.next();
-            if(cmd.cmdName.equalsIgnoreCase(s)) {
+            ICommand cmd = (ICommand) Commands.next();
+            if(cmd.getName().equalsIgnoreCase(s)) {
                 return cmd;
             }
         }
-
         return null;
     }
 
-    public boolean addSubCommand(SubCommand command)
+    public boolean addSubCommand(ICommand command)
     {
-        //Check name
+        //TODO Check name
         cmds.add(command);
+        command.setParent(this);
         return true;
     }
-
-
-
-    //public abstract void execute(ColoredConsole console, String[] arg) throws NotEnoughArgumentsException;
 }

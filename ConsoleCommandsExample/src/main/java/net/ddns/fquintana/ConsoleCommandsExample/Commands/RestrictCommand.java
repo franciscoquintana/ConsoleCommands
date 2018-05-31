@@ -10,7 +10,7 @@ public class RestrictCommand extends CommandSingle {
     }
 
     @Override
-    public boolean run(ColoredConsole console, String[] Args) {
+    public boolean run(ColoredConsole console, String[] args) {
         Boolean restrict = !CommandManager.getManager().isRestricted();
         CommandManager.getManager().setRestricted(!CommandManager.getManager().isRestricted());
         if (restrict)
