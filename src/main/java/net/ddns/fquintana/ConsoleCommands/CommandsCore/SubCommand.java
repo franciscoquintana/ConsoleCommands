@@ -38,8 +38,7 @@ public abstract class SubCommand implements ICommand
         }
 
         console.error ("Uso incorrecto: " + cmdPrincipal.getName() + " " + this.helper());
-
-
+        
         return true;
     }
 
@@ -53,7 +52,9 @@ public abstract class SubCommand implements ICommand
 
     @Override
     public void showHelp(ColoredConsole console) {
-
+        //console.sendMessage(ChatColor.GRAY + "- " + ChatColor.AQUA +  helper());
+        console.sendMessage(ChatColor.AQUA +  helper());
+        console.sendMessage(descr());
     }
 
     @Override

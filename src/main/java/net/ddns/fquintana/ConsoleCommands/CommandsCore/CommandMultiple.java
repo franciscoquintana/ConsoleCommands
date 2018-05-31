@@ -11,7 +11,7 @@ public class CommandMultiple implements ICommand {
     private String name;
     private int minargs;
 
-    private List cmds = new ArrayList();
+    private List<ICommand> cmds = new ArrayList();
 
     public CommandMultiple(String name, int minargs) {
         this.name = name;
@@ -61,8 +61,7 @@ public class CommandMultiple implements ICommand {
 
         while(Commands.hasNext()) {
             SubCommand cmd = (SubCommand) Commands.next();
-            console.sendMessage(ChatColor.GRAY + "- " + ChatColor.AQUA +  cmd.helper());
-            console.sendMessage(cmd.descr());
+            cmd.showHelp(console);
         }
 
         console.sendMessage( ChatColor.GRAY + String.join("", Collections.nCopies(24*2+name.length()-1, "-")));
@@ -88,7 +87,7 @@ public class CommandMultiple implements ICommand {
         return new ArrayList<>();
     }
 
-    private SubCommand getCommands(String s) {
+    public ICommand getCommands(String s) {
         Iterator Commands = this.cmds.iterator();
 
         while(Commands.hasNext()) {

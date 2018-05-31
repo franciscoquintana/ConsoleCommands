@@ -3,9 +3,12 @@ package net.ddns.fquintana.ConsoleCommands.Commands;
 import net.ddns.fquintana.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.CommandsCore.*;
 import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
+import net.ddns.fquintana.ConsoleCommands.Utils.UtilArrays;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class HelpCommand extends CommandSingle {
 
@@ -13,6 +16,26 @@ public class HelpCommand extends CommandSingle {
     public HelpCommand() {
         super("help","[Comando]","Muestra la ayuda",0);
     }
+
+    @Override
+    public List<String> getOptions(String[] args) {
+        ArrayList<String> options = new ArrayList<>();
+        CommandManager manager = CommandManager.getManager();
+        if (args.length == 1) {
+            for (ICommand iCommand : manager.getCommands()) {
+                if (iCommand.getName().startsWith(args[0])) {
+                    options.add(iCommand.getName());
+                }
+            }
+        }
+        else {
+            ICommand command = manager.getCommand(args[0]);
+            return command.getOptions(UtilArrays.removeArgs(args, 1));
+        }
+        return options;
+    }
+
+
 
     @Override
     public boolean run(ColoredConsole console, String[] Args) {
@@ -33,8 +56,18 @@ public class HelpCommand extends CommandSingle {
         else
         {
             ICommand command = CommandManager.getManager().getCommand(Args[0]);
-            if (command == null)
-            {
+            return showHelp(console, command, UtilArrays.removeArgs(Args, 1));
+        }
+    }
+
+    public boolean showHelp(ColoredConsole console, ICommand command, String[] args) {
+        if (args.length != 0 && command instanceof CommandMultiple) {
+            CommandMultiple multiple = (CommandMultiple) command;
+            ICommand command1 = multiple.getCommands(args[0]);
+            return showHelp(console, command1, UtilArrays.removeArgs(args, 1));
+        }
+        else {
+            if (command == null) {
                 console.error("Ese comando no existe");
                 return false;
             }
@@ -44,7 +77,5 @@ public class HelpCommand extends CommandSingle {
                 console.error("Ese comando no esta permitido, por lo que no podemos mostrar su ayuda");
             return true;
         }
-
-
     }
 }
