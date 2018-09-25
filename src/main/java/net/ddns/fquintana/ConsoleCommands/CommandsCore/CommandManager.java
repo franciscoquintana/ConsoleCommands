@@ -135,7 +135,7 @@ public class CommandManager extends Thread {
         {
             System.out.print(ChatColor.BOLD + ChatColor.GREEN);
             String Input = coloredConsole.readLine();
-            if (Input.trim().isEmpty())
+            if (Input.trim().isEmpty() || isClosing())
             {
                 continue;
             }
