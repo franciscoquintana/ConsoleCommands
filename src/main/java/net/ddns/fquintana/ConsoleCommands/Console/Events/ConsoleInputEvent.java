@@ -1,4 +1,6 @@
-package net.ddns.fquintana.ConsoleCommands.Console;
+package net.ddns.fquintana.ConsoleCommands.Console.Events;
+
+import net.ddns.fquintana.ConsoleCommands.Console.AnsiReader;
 
 public class ConsoleInputEvent {
     private final StringBuilder currentBuffer;

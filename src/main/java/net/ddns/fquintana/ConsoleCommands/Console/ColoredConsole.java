@@ -3,6 +3,8 @@ package net.ddns.fquintana.ConsoleCommands.Console;
 import biz.source_code.utils.RawConsoleInput;
 import net.ddns.fquintana.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.CommandsCore.ExceptionExtern;
+import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInputEvent;
+import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInvokeEvent;
 
 import java.io.IOException;
 import java.io.PrintStream;

@@ -1,4 +1,4 @@
-package net.ddns.fquintana.ConsoleCommands.Console;
+package net.ddns.fquintana.ConsoleCommands.Console.Events;
 
 public class ConsoleInvokeEvent {
     private StringBuilder stringBuilder;

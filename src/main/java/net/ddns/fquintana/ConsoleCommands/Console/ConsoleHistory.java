@@ -1,5 +1,8 @@
 package net.ddns.fquintana.ConsoleCommands.Console;
 
+import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInputEvent;
+import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInvokeEvent;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,7 +19,6 @@ public class ConsoleHistory {
     /**
      * EVENTS
      */
-
     private Boolean previousHis = false;
 
     private HistoryInputEvent inputEvent = new HistoryInputEvent();
@@ -80,6 +82,7 @@ public class ConsoleHistory {
         actual = commands.size() - 1;
     }
 
+    //Evita el movimiento del historial a algo mas nuevo
     public void setActualNext() {
         if (actual != null) {
             moveUp = false;
@@ -118,7 +121,7 @@ public class ConsoleHistory {
 
             if(read == ConsoleConstants.CHAR_CTRL_Z)
                 undoHis = true;
-                //ARRIBA
+            //ARRIBA
             else if (read == 57416 || consoleInputEvent.getAnsiReader().getResult().equals(ConsoleConstants.ARRIBA)) {
                 ConsoleHistory.this.up();
                 showHis = true;

@@ -1,5 +1,7 @@
 package net.ddns.fquintana.ConsoleCommands.Console;
 
+import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInputEvent;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,16 +11,7 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
     private Integer lastIndex = 0;
     private String string = null;
 
-    public ConsoleTab(String ...opciones) {
-        //this.opciones = Arrays.asList(opciones);
-    }
-
-    public String get() {
-        return null;
-    }
-
-    public void setOpciones(List<String> opciones) {
-        //this.opciones = opciones;
+    public ConsoleTab() {
     }
 
     public abstract List<String> getOptions(String[] args);
@@ -31,6 +24,7 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
     private void tab(StringBuilder b) {
         String str;
         boolean previous = false;
+
         if (string == null)
             string = b.toString();
         else {
@@ -40,13 +34,13 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
 
 
         List<String> strs = new ArrayList<String>(Arrays.asList(str.split(" ")));
+
         if (str.length() != 0 && str.charAt(str.length()-1) == ' ')
             strs.add("");
+
         List<String> opciones = getOptions(strs.toArray(new String[0]));
         String strCompare = strs.get(strs.size() - 1).toLowerCase();
 
-        /*if (str.length() != 0 && str.charAt(str.length()-1) == ' ')
-            strCompare = "";*/
 
         if (previous) {
             int amount = opciones.get(lastIndex-1).length() - strCompare.length();
@@ -69,6 +63,7 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
             }
         }
 
+        //TODO Manera incorrecta de usarse?
         //SI SE USA MAL LA API FIX
         if (previous) {
             String opcion = opciones.get(lastIndex - 1).toLowerCase();

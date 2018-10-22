@@ -14,7 +14,7 @@ public class HelpCommand extends CommandSingle {
 
 
     public HelpCommand() {
-        super("help","[Comando]","Muestra la ayuda",0);
+        super("help","[comando]","Muestra la ayuda",0);
     }
 
     @Override

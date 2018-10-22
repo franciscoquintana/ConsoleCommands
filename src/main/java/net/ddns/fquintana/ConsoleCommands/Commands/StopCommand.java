@@ -12,7 +12,7 @@ public class StopCommand extends CommandSingle {
 
     @Override
     public boolean run(ColoredConsole console, String[] args) {
-        console.sendMessage("Cerrando.");
+        console.sendMessage("Pulse una tecla para salir.");
         CommandManager.getManager().setClosing(true);
         return true;
     }
