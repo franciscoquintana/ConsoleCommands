@@ -2,22 +2,23 @@ package net.ddns.fquintana.ConsoleCommands.Console;
 
 import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInputEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
     private Integer lastIndex = 0;
-    private String string = null;
+    private String originalString = null;
+    private ColoredConsole coloredConsole;
 
-    public ConsoleTab() {
+    public ConsoleTab(ColoredConsole coloredConsole) {
+        this.coloredConsole = coloredConsole;
     }
 
     public abstract List<String> getOptions(String[] args);
 
     private void reset() {
-        string = null;
+        originalString = null;
         lastIndex = 0;
     }
 
@@ -25,54 +26,72 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
         String str;
         boolean previous = false;
 
-        if (string == null)
-            string = b.toString();
+        if (originalString == null)
+            originalString = b.toString();
         else {
             previous = true;
         }
-        str = string;
+        str = originalString;
 
-
-        List<String> strs = new ArrayList<String>(Arrays.asList(str.split(" ")));
+        List<ConsoleArg> args = ConsoleUtils.strToArgs(str);
 
         if (str.length() != 0 && str.charAt(str.length()-1) == ' ')
-            strs.add("");
+            args.add(new ConsoleArg("", false));
 
-        List<String> opciones = getOptions(strs.toArray(new String[0]));
-        String strCompare = strs.get(strs.size() - 1).toLowerCase();
+        //TODO REMOVE THIS
+        List<String> argsStr = args.stream().map(ConsoleArg::getArgStr).collect(Collectors.toList());
 
+        List<String> opciones = getOptions(argsStr.toArray(new String[0]));
 
+        ConsoleArg argCompare = args.get(args.size() - 1);
+
+        //SI NO ES EL PRIMERO LIMPIAMOS LO ESCRITO
         if (previous) {
-            int amount = opciones.get(lastIndex-1).length() - strCompare.length();
+            int amount = opciones.get(lastIndex-1).length() - argCompare.getArgStr().length();
+            if (argCompare.isHaveQuotes())
+                amount++;
             ConsoleUtils.clear(amount);
             b.setLength(b.length() - amount);
+            if (argCompare.isHaveQuotes())
+                coloredConsole.addToCurrent("\"");
         }
 
+        //RESET TAB INDEX IF LAST
         if (lastIndex == opciones.size())
             lastIndex = 0;
 
         for (int i = lastIndex; i < opciones.size(); i++) {
             String opcion = opciones.get(i).toLowerCase();
-            if (opcion.startsWith(strCompare))
+            if (opcion.startsWith(argCompare.getArgStr().toLowerCase()))
             {
-                String strAdd = opcion.substring(strCompare.length(), opcion.length());
-                System.out.print(strAdd);
+                String strAdd = opcion.substring(argCompare.getArgStr().length());
+                coloredConsole.consoleMovement.moveRight();
+                if (argCompare.isHaveQuotes())
+                    coloredConsole.consoleMovement.deleteOne();
+
+                coloredConsole.write(strAdd);
                 b.append(strAdd);
+
+                if (argCompare.isHaveQuotes())
+                    coloredConsole.addToCurrent("\"");
+
                 lastIndex = i + 1;
                 return;
             }
         }
 
-        //TODO Manera incorrecta de usarse?
+
         //SI SE USA MAL LA API FIX
-        if (previous) {
+        //Nos pasan opciones que no tienen que ver con la stringOriginal
+        //Ya no es necesario
+        /*if (previous) {
             String opcion = opciones.get(lastIndex - 1).toLowerCase();
-            String strAdd = opcion.substring(strCompare.length(), opcion.length());
+            String strAdd = opcion.substring(argCompare.getArgStr().length(), opcion.length());
             System.out.print(strAdd);
             b.append(strAdd);
-        }
+        }*/
 
-        string = null;
+        originalString = null;
     }
 
     @Override

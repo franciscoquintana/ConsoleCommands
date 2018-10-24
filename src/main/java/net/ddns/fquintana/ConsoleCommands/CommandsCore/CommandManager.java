@@ -1,12 +1,11 @@
 package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
 import net.ddns.fquintana.ChatColor;
-import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
-import net.ddns.fquintana.ConsoleCommands.Console.ConsoleHistory;
-import net.ddns.fquintana.ConsoleCommands.Console.ConsoleTab;
+import net.ddns.fquintana.ConsoleCommands.Console.*;
 import net.ddns.fquintana.ConsoleCommands.Utils.UtilArrays;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommandManager extends Thread {
 
@@ -118,7 +117,7 @@ public class CommandManager extends Thread {
     synchronized public void run() {
 
         ColoredConsole coloredConsole = new ColoredConsole();
-        ConsoleTab tab = new ConsoleTab() {
+        ConsoleTab tab = new ConsoleTab(coloredConsole) {
             @Override
             public List<String> getOptions(String[] args) {
                 return CommandManager.this.getOptions(args);
@@ -139,7 +138,7 @@ public class CommandManager extends Thread {
             {
                 continue;
             }
-            String InputSplitted[] = Input.split(" ");
+            String InputSplitted[] = ConsoleUtils.strToArgs(Input).stream().map(ConsoleArg::getArgStr).collect(Collectors.toList()).toArray(new String[0]);
             String NombreComando = InputSplitted[0];
             String Args[] = Arrays.copyOfRange(InputSplitted,1,InputSplitted.length);
 
@@ -182,8 +181,12 @@ public class CommandManager extends Thread {
         if (args.length > 1 && this.getCommand(args[0]) != null)
             if (!isRestricted() || isAllowed(args[0]))
                     return this.getCommand(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
-        if (args.length == 1)
-            return isRestricted() ? commandsValid : Arrays.asList(commands.keySet().toArray(new String[0]));
+        if (args.length == 1) {
+            List<String> commandList = isRestricted() ? commandsValid : Arrays.asList(commands.keySet().toArray(new String[0]));
+            //FILTRO
+            return commandList.stream().filter(str -> str.toLowerCase().startsWith(args[0])).collect(Collectors.toList());
+        }
+
 
         return new ArrayList<>();
     }
