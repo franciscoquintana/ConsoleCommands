@@ -119,7 +119,7 @@ public class CommandManager extends Thread {
         ColoredConsole coloredConsole = new ColoredConsole();
         ConsoleTab tab = new ConsoleTab(coloredConsole) {
             @Override
-            public List<String> getOptions(String[] args) {
+            public List<String> getOptions(ConsoleArg[] args) {
                 return CommandManager.this.getOptions(args);
             }
         };
@@ -143,21 +143,21 @@ public class CommandManager extends Thread {
             {
                 continue;
             }
-            String InputSplitted[] = ConsoleUtils.strToArgs(Input).stream().map(ConsoleArg::getArgStr).collect(Collectors.toList()).toArray(new String[0]);
-            String NombreComando = InputSplitted[0];
-            String Args[] = Arrays.copyOfRange(InputSplitted,1,InputSplitted.length);
+            ConsoleArg inputSplitted[] = ConsoleUtils.strToArgs(Input).toArray(new ConsoleArg[0]);
+            String nombreComando = inputSplitted[0].getArgStr();
+            ConsoleArg args[] = Arrays.copyOfRange(inputSplitted,1,inputSplitted.length);
 
             coloredConsole.sendMessage("");
-            if (commands.containsKey(NombreComando.toUpperCase()) )
+            if (commands.containsKey(nombreComando.toUpperCase()) )
             {
-                if (isRestricted() && !commandsValid.contains(NombreComando.toUpperCase()))
+                if (isRestricted() && !commandsValid.contains(nombreComando.toUpperCase()))
                 {
                     coloredConsole.error("Ese comando no se puede usar en este momento");
                     continue;
                 }
-                ICommand command = getCommand(NombreComando);
+                ICommand command = getCommand(nombreComando);
                 try {
-                    command.onCommand(coloredConsole, Args);
+                    command.onCommand(coloredConsole, args);
                 } catch (ExceptionExtern ex) {
                     coloredConsole.error("Ocurrio un error no controlado al ejecutar el comando");
                     coloredConsole.error("Ha ocurrido el siguiente error en la app " + ChatColor.GRAY + new java.io.File(command.getClass().getProtectionDomain()
@@ -175,21 +175,21 @@ public class CommandManager extends Thread {
             }
             else
             {
-                coloredConsole.sendMessage( ChatColor.CYAN + "'" + NombreComando + "'" + ChatColor.RED + " comando desconocido, usa help para ver la lista de comandos");
+                coloredConsole.sendMessage( ChatColor.CYAN + "'" + nombreComando + "'" + ChatColor.RED + " comando desconocido, usa help para ver la lista de comandos");
             }
             coloredConsole.sendMessage("");
 
         }
     }
 
-    public List<String> getOptions(String[] args) {
-        if (args.length > 1 && this.getCommand(args[0]) != null)
-            if (!isRestricted() || isAllowed(args[0]))
-                    return this.getCommand(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
+    public List<String> getOptions(ConsoleArg[] args) {
+        if (args.length > 1 && this.getCommand(args[0].getArgStr()) != null)
+            if (!isRestricted() || isAllowed(args[0].getArgStr()))
+                    return this.getCommand(args[0].getArgStr()).getOptions(UtilArrays.removeArgs(args, 1));
         if (args.length == 1) {
             List<String> commandList = isRestricted() ? commandsValid : Arrays.asList(commands.keySet().toArray(new String[0]));
             //FILTRO
-            return commandList.stream().filter(str -> str.toLowerCase().startsWith(args[0])).collect(Collectors.toList());
+            return commandList.stream().filter(str -> str.toLowerCase().startsWith(args[0].getArgStr())).collect(Collectors.toList());
         }
 
 

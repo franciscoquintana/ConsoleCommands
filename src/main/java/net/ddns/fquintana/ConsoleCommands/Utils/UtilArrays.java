@@ -1,5 +1,7 @@
 package net.ddns.fquintana.ConsoleCommands.Utils;
 
+import net.ddns.fquintana.ConsoleCommands.Console.ConsoleArg;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,16 +10,16 @@ import java.util.List;
  * Created by HounterX on 03/01/2018.
  */
 public class UtilArrays {
-    public static String[] removeArgs(String[] args, int amount)
+    public static ConsoleArg[] removeArgs(ConsoleArg[] args, int amount)
     {
-        String[] newArgs;
+        ConsoleArg[] newArgs;
 
         try {
             newArgs = Arrays.copyOfRange(args,amount,args.length);
         }
         catch (Exception ex)
         {
-            newArgs = new String[0];
+            newArgs = new ConsoleArg[0];
         }
 
         return newArgs;

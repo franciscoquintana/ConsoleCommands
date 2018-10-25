@@ -15,7 +15,7 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
         this.coloredConsole = coloredConsole;
     }
 
-    public abstract List<String> getOptions(String[] args);
+    public abstract List<String> getOptions(ConsoleArg[] args);
 
     private void reset() {
         originalString = null;
@@ -39,10 +39,7 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
         if (str.length() != 0 && str.charAt(str.length()-1) == ' ')
             args.add(new ConsoleArg("", false));
 
-        //TODO REMOVE THIS
-        List<String> argsStr = args.stream().map(ConsoleArg::getArgStr).collect(Collectors.toList());
-
-        List<String> opciones = getOptions(argsStr.toArray(new String[0]));
+        List<String> opciones = getOptions((ConsoleArg[]) args.toArray());
 
         ConsoleArg argCompare = args.get(args.size() - 1);
 

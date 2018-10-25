@@ -3,6 +3,7 @@ package net.ddns.fquintana.ConsoleCommands.Commands;
 import net.ddns.fquintana.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.CommandsCore.*;
 import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
+import net.ddns.fquintana.ConsoleCommands.Console.ConsoleArg;
 import net.ddns.fquintana.ConsoleCommands.Utils.UtilArrays;
 
 import java.util.ArrayList;
@@ -18,18 +19,19 @@ public class HelpCommand extends CommandSingle {
     }
 
     @Override
-    public List<String> getOptions(String[] args) {
+    public List<String> getOptions(ConsoleArg[] args) {
+        String commandName = args[0].getArgStr();
         ArrayList<String> options = new ArrayList<>();
         CommandManager manager = CommandManager.getManager();
         if (args.length == 1) {
             for (ICommand iCommand : manager.getCommands()) {
-                if (iCommand.getName().startsWith(args[0])) {
+                if (iCommand.getName().startsWith(commandName)) {
                     options.add(iCommand.getName());
                 }
             }
         }
         else {
-            ICommand command = manager.getCommand(args[0]);
+            ICommand command = manager.getCommand(commandName);
             return command.getOptions(UtilArrays.removeArgs(args, 1));
         }
         return options;
@@ -38,7 +40,7 @@ public class HelpCommand extends CommandSingle {
 
 
     @Override
-    public boolean run(ColoredConsole console, String[] args) {
+    public boolean run(ColoredConsole console, ConsoleArg[] args) {
         if (args.length == 0)
         {
             Collection<ICommand> Comandos = CommandManager.getManager().getCommands();
@@ -55,15 +57,15 @@ public class HelpCommand extends CommandSingle {
         }
         else
         {
-            ICommand command = CommandManager.getManager().getCommand(args[0]);
+            ICommand command = CommandManager.getManager().getCommand(args[0].getArgStr());
             return showHelp(console, command, UtilArrays.removeArgs(args, 1));
         }
     }
 
-    public boolean showHelp(ColoredConsole console, ICommand command, String[] args) {
+    public boolean showHelp(ColoredConsole console, ICommand command, ConsoleArg[] args) {
         if (args.length != 0 && command instanceof CommandMultiple) {
             CommandMultiple multiple = (CommandMultiple) command;
-            ICommand command1 = multiple.getCommands(args[0]);
+            ICommand command1 = multiple.getCommands(args[0].getArgStr());
             return showHelp(console, command1, UtilArrays.removeArgs(args, 1));
         }
         else {

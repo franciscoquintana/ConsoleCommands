@@ -2,6 +2,7 @@ package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
 import net.ddns.fquintana.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
+import net.ddns.fquintana.ConsoleCommands.Console.ConsoleArg;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public abstract class CommandSingle implements ICommand {
     }
 
     @Override
-    public boolean onCommand(ColoredConsole console, String[] args) throws ExceptionExtern {
+    public boolean onCommand(ColoredConsole console, ConsoleArg[] args) throws ExceptionExtern {
         if(this.argLength <= args.length) {
             try {
                 return this.run(console, args);
@@ -63,7 +64,7 @@ public abstract class CommandSingle implements ICommand {
         return true;
     }
 
-    abstract public boolean run(ColoredConsole console, String[] args);
+    abstract public boolean run(ColoredConsole console, ConsoleArg[] args);
 
     public String helper() {
         String helper = isSubCommand() ? parentCmd.helper() : "";
@@ -75,7 +76,7 @@ public abstract class CommandSingle implements ICommand {
     }
 
     @Override
-    public List<String> getOptions(String[] args) {
+    public List<String> getOptions(ConsoleArg[] args) {
         return new ArrayList<>();
     }
 }

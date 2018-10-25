@@ -3,6 +3,7 @@ package net.ddns.fquintana.ConsoleCommands.Commands;
 import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
 import net.ddns.fquintana.ConsoleCommands.CommandsCore.CommandManager;
 import net.ddns.fquintana.ConsoleCommands.CommandsCore.CommandSingle;
+import net.ddns.fquintana.ConsoleCommands.Console.ConsoleArg;
 
 public class StopCommand extends CommandSingle {
 
@@ -11,7 +12,7 @@ public class StopCommand extends CommandSingle {
     }
 
     @Override
-    public boolean run(ColoredConsole console, String[] args) {
+    public boolean run(ColoredConsole console, ConsoleArg[] args) {
         console.sendMessage("Pulse una tecla para salir.");
         CommandManager.getManager().setClosing(true);
         return true;

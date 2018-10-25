@@ -2,6 +2,7 @@ package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
 import net.ddns.fquintana.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
+import net.ddns.fquintana.ConsoleCommands.Console.ConsoleArg;
 import net.ddns.fquintana.ConsoleCommands.Utils.UtilArrays;
 
 import java.util.*;
@@ -33,7 +34,7 @@ public class CommandMultiple implements ICommand {
     }
 
     @Override
-    public boolean onCommand(ColoredConsole console, String[] args) throws ExceptionExtern {
+    public boolean onCommand(ColoredConsole console, ConsoleArg[] args) throws ExceptionExtern {
         if (args.length < minargs){
             try {
                 throw new NotEnoughArgumentsException();
@@ -43,9 +44,9 @@ public class CommandMultiple implements ICommand {
                 return false;
             }
         }
-        if(args.length != 0 && this.getCommands(args[0]) != null) {
-            String Args[] = Arrays.copyOfRange(args,1,args.length);
-            this.getCommands(args[0]).onCommand(console, Args);
+        if(args.length != 0 && this.getCommands(args[0].getArgStr()) != null) {
+            ConsoleArg argsWhitoutName[] = Arrays.copyOfRange(args,1, args.length);
+            this.getCommands(args[0].getArgStr()).onCommand(console, argsWhitoutName);
         } else {
 
             if (cmds.size() == 0)
@@ -84,23 +85,23 @@ public class CommandMultiple implements ICommand {
     }
 
     @Override
-    public List<String> getOptions(String[] args) {
-        if (args.length > 1 && this.getCommands(args[0]) != null)
-            return this.getCommands(args[0]).getOptions(UtilArrays.removeArgs(args, 1));
-        if (args.length > 0) {
-            List<String> strings = new ArrayList<>();
-            Iterator Commands = this.cmds.iterator();
+    public List<String> getOptions(ConsoleArg[] args) {
+        String commandName = args[0].getArgStr();
+        if (args.length > 1 && this.getCommands(commandName) != null)
+            return this.getCommands(commandName).getOptions(UtilArrays.removeArgs(args, 1));
 
-            while(Commands.hasNext()) {
-                ICommand cmd = (ICommand) Commands.next();
-                String name = cmd.getName().toLowerCase();
-                if(name.startsWith(args[0])) {
-                    strings.add(name.toLowerCase());
-                }
+        List<String> strings = new ArrayList<>();
+        Iterator Commands = this.cmds.iterator();
+
+        while(Commands.hasNext()) {
+            ICommand cmd = (ICommand) Commands.next();
+            String name = cmd.getName().toLowerCase();
+            if(name.startsWith(commandName)) {
+                strings.add(name.toLowerCase());
             }
-            return strings;
         }
-        return new ArrayList<>();
+
+        return strings;
     }
 
     public ICommand getCommands(String s) {
