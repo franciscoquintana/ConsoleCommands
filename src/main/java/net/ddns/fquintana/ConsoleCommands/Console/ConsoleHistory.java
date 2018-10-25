@@ -138,14 +138,13 @@ public class ConsoleHistory {
                 ConsoleHistory.this.setActualNext();
 
             if (showHis || undoHis) {
+                consoleInputEvent.getConsole().consoleMovement.delete(1);
                 String str = undoHis ? ConsoleHistory.this.undo() : ConsoleHistory.this.get();
                 if (str != null) {
                     if (!previousHis)
                         ConsoleHistory.this.setStrRestore(b.toString());
-                    ConsoleUtils.clear(b.length());
-                    System.out.print(str);
-                    b.setLength(0);
-                    b.append(str);
+                    consoleInputEvent.getConsole().consoleMovement.delete(b.length());
+                    consoleInputEvent.getConsole().addToCurrent(str);
                 }
             }
             previousHis = !resetHis;

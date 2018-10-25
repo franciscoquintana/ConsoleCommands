@@ -22,13 +22,25 @@ public class ColoredConsole {
         }
     }
 
+    private boolean reading = false;
+    private String strRead;
+
+    private Character character;
+
+    //TODO WAIT UNTIL READ FINISH
+    public void setCharacter(Character character) throws InterruptedException {
+        synchronized (this) {
+            while (reading)
+                wait();
+        }
+        this.character = character;
+    }
+
     private Integer currentDespl;
     private StringBuilder currentStr;
     public ConsoleMovement consoleMovement = new ConsoleMovement();
     
     private PrintStream out = System.out;
-
-
     public PrintStream getOut() {
         return out;
     }
@@ -44,10 +56,23 @@ public class ColoredConsole {
         return eventsInvoke;
     }
 
-    public String readLine(Character character) {
+    public String readLine() throws InterruptedException {
+        synchronized (this) {
+            if (reading)
+                wait();
+            if (!reading)
+                internalReadLine();
+            else
+                wait();
+        }
+        return strRead;
+    }
+
+    private void internalReadLine() {
+        String text = "";
+        reading = true;
         try {
             int read;
-            //TODO One access MUTEX
             currentStr = new StringBuilder();
             AnsiReader ansiReader = new AnsiReader();
             boolean terminate = false;
@@ -66,7 +91,7 @@ public class ColoredConsole {
                     if (!ConsoleUtils.isPrintableChar((char) read)) {
                         //BORRAR
                         if(read == ConsoleConstants.CHAR_BACKSPACE || read == 127) {
-                            consoleMovement.deleteOne(character);
+                            consoleMovement.deleteOne();
                         } else if(read == '\n') {
                             getOut().print('\n');
                             terminate = true;
@@ -117,7 +142,7 @@ public class ColoredConsole {
 
                     }
 
-                    ConsoleInputEvent event = new ConsoleInputEvent(currentStr, (char) read, ansiReader);
+                    ConsoleInputEvent event = new ConsoleInputEvent(currentStr, (char) read, ansiReader, this);
                     for (Consumer<ConsoleInputEvent> consumerEvent : getEventsInput()){
                         consumerEvent.accept(event);
                     }
@@ -130,15 +155,15 @@ public class ColoredConsole {
             for (Consumer<ConsoleInvokeEvent> consumerEvent : getEventsInvoke()){
                 consumerEvent.accept(event);
             }
-            return currentStr.toString();
+            text = currentStr.toString();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return "";
-    }
-
-    public String readLine() {
-        return readLine(null);
+        reading = false;
+        strRead = text;
+        synchronized (this) {
+            notifyAll();
+        }
     }
 
     public void addToCurrent(String str) {
@@ -216,26 +241,26 @@ public class ColoredConsole {
         }
 
         public void deleteOne() {
-            deleteOne(null);
+            delete(1);
         }
 
-        private void deleteOne(Character character) {
-            if (currentStr.length() + currentDespl != 0 ) {
-                Integer posChar = currentStr.length() - 1 + currentDespl;
-                if (posChar == currentStr.length() -1)
-                    ConsoleUtils.clear(1);
+        public void delete(int amount) {
+            if (currentStr.length() + currentDespl - amount >= 0 ) {
+                Integer posChar = currentStr.length() - amount + currentDespl;
+                if (posChar == currentStr.length() - amount)
+                    ConsoleUtils.clear(amount);
                 else {
                     getOut().print(ConsoleConstants.CHAR_BACKSPACE);
-                    Integer amount = Math.abs(currentDespl) + 1;
-                    for (int i = 0; i < amount; i++) {
+                    Integer amountWrite = Math.abs(currentDespl) + amount;
+                    for (int i = 0; i < amountWrite; i++) {
                         getOut().print(' ');
                     }
-                    getOut().print(ConsoleUtils.left(amount));
-                    write(currentStr.substring(posChar + 1, currentStr.length()), character);
-                    getOut().print(ConsoleUtils.left(amount-1));
+                    getOut().print(ConsoleUtils.left(amountWrite));
+                    write(currentStr.substring(posChar + amount, currentStr.length()), null);
+                    getOut().print(ConsoleUtils.left(amountWrite - amount));
                 }
 
-                currentStr.deleteCharAt(posChar);
+                currentStr.delete(posChar, posChar + amount);
             }
         }
 

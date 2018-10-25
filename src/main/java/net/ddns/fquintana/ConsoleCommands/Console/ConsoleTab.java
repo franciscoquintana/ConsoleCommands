@@ -22,6 +22,7 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
         lastIndex = 0;
     }
 
+    //Las opciones deben estar filtradas
     private void tab(StringBuilder b) {
         String str;
         boolean previous = false;
@@ -50,13 +51,13 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
             int amount = opciones.get(lastIndex-1).length() - argCompare.getArgStr().length();
             if (argCompare.isHaveQuotes())
                 amount++;
-            ConsoleUtils.clear(amount);
-            b.setLength(b.length() - amount);
+            coloredConsole.consoleMovement.delete(amount);
             if (argCompare.isHaveQuotes())
                 coloredConsole.addToCurrent("\"");
         }
 
         //RESET TAB INDEX IF LAST
+        //Si no esta filtrado no funcionara
         if (lastIndex == opciones.size())
             lastIndex = 0;
 
@@ -65,12 +66,12 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
             if (opcion.startsWith(argCompare.getArgStr().toLowerCase()))
             {
                 String strAdd = opcion.substring(argCompare.getArgStr().length());
+
                 coloredConsole.consoleMovement.moveRight();
                 if (argCompare.isHaveQuotes())
                     coloredConsole.consoleMovement.deleteOne();
 
-                coloredConsole.write(strAdd);
-                b.append(strAdd);
+                coloredConsole.addToCurrent(strAdd);
 
                 if (argCompare.isHaveQuotes())
                     coloredConsole.addToCurrent("\"");
@@ -79,18 +80,6 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
                 return;
             }
         }
-
-
-        //SI SE USA MAL LA API FIX
-        //Nos pasan opciones que no tienen que ver con la stringOriginal
-        //Ya no es necesario
-        /*if (previous) {
-            String opcion = opciones.get(lastIndex - 1).toLowerCase();
-            String strAdd = opcion.substring(argCompare.getArgStr().length(), opcion.length());
-            System.out.print(strAdd);
-            b.append(strAdd);
-        }*/
-
         originalString = null;
     }
 
