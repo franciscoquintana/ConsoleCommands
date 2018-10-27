@@ -1,48 +1,34 @@
 package net.ddns.fquintana.ConsoleCommands.Console.Events;
 
-import net.ddns.fquintana.ConsoleCommands.Console.AnsiReader;
 import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
+import net.ddns.fquintana.ConsoleCommands.Console.Reader.ConsoleRead;
 
 public class ConsoleInputEvent {
-    private final StringBuilder currentBuffer;
-    private final Character addedChar;
-    private final AnsiReader ansiReader;
+    private final ConsoleRead lastRead;
     private final ColoredConsole console;
 
-    private boolean shouldCancel;
+    private boolean cancelled;
 
-    public ConsoleInputEvent(StringBuilder currentBuffer, Character addedChar, AnsiReader ansiReader, ColoredConsole console) {
-        this.currentBuffer = currentBuffer;
-        this.addedChar = addedChar;
-        this.ansiReader = ansiReader;
+    public ConsoleInputEvent( ColoredConsole console, ConsoleRead lastRead) {
+        this.lastRead = lastRead;
         this.console = console;
     }
 
-    public StringBuilder getCurrentBuffer() {
-        return currentBuffer;
+
+    public ConsoleRead getLastRead() {
+        return lastRead;
     }
 
-    public char getAddedChar() {
-        return addedChar;
-    }
-
-    public AnsiReader getAnsiReader() {
-        return ansiReader;
-    }
 
     public ColoredConsole getConsole() {
         return console;
     }
 
-    public void clearBuffer() {
-        currentBuffer.setLength(0);
+    public void setCancelled(boolean state) {
+         cancelled = state;
     }
 
-    public void cancelLoop() {
-        shouldCancel = true;
-    }
-
-    public boolean isShouldCancel() {
-        return shouldCancel;
+    public boolean isCancelled() {
+        return cancelled;
     }
 }

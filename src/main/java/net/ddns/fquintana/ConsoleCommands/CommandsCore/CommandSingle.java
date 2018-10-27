@@ -47,7 +47,7 @@ public abstract class CommandSingle implements ICommand {
     }
 
     @Override
-    public boolean onCommand(ColoredConsole console, ConsoleArg[] args) throws ExceptionExtern {
+    public boolean onCommand(ColoredConsole console, String[] args) throws ExceptionExtern {
         if(this.argLength <= args.length) {
             try {
                 return this.run(console, args);
@@ -64,7 +64,7 @@ public abstract class CommandSingle implements ICommand {
         return true;
     }
 
-    abstract public boolean run(ColoredConsole console, ConsoleArg[] args);
+    abstract public boolean run(ColoredConsole console, String[] args);
 
     public String helper() {
         String helper = isSubCommand() ? parentCmd.helper() : "";
@@ -76,7 +76,7 @@ public abstract class CommandSingle implements ICommand {
     }
 
     @Override
-    public List<String> getOptions(ConsoleArg[] args) {
+    public List<String> getOptions(String[] args) {
         return new ArrayList<>();
     }
 }

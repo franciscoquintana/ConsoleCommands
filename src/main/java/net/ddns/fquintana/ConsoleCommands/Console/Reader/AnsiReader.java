@@ -1,11 +1,12 @@
-package net.ddns.fquintana.ConsoleCommands.Console;
+package net.ddns.fquintana.ConsoleCommands.Console.Reader;
+
+import net.ddns.fquintana.ConsoleCommands.Console.ConsoleConstants;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class AnsiReader {
     public enum ANSI {DISABLED, READINGBRACKET, READCOMMAND}
-    private List<String> ansiCmds;
     public ANSI status;
     public StringBuilder builder;
 
@@ -14,7 +15,6 @@ public class AnsiReader {
     public AnsiReader() {
         this.status = ANSI.DISABLED;
         this.builder = new StringBuilder();
-        ansiCmds = Arrays.asList(ConsoleConstants.IZQUIERDA, ConsoleConstants.DERECHA, ConsoleConstants.ABAJO, ConsoleConstants.ARRIBA, ConsoleConstants.SUPR, ConsoleConstants.INSERT);
     }
 
     public void reset() {
@@ -22,21 +22,13 @@ public class AnsiReader {
         builder = new StringBuilder();
     }
 
-    public boolean existInList(String str){
-        for (String strCmd : ansiCmds) {
-            if (strCmd.startsWith(str))
-                return true;
-        }
-        return false;
+    boolean checkFinish() {
+        String string = builder.toString();
+        if (Character.isDigit(string.charAt(2)))
+            return string.length() == 4;
+        return string.length() == 3;
     }
 
-    public boolean equalsInList(String str){
-        for (String strCmd : ansiCmds) {
-            if (strCmd.equals(str))
-                return true;
-        }
-        return false;
-    }
 
     public void add(char ch) {
         result = null;
@@ -53,25 +45,22 @@ public class AnsiReader {
         }
         else
         if (status == ANSI.READCOMMAND) {
-            if (!existInList(builder.toString() + ch))
+            if (checkFinish()) {
+                result = builder.toString();
                 reset();
+            }
         }
         else
         if (status == ANSI.DISABLED)
             return;
 
         builder.append(ch);
-
-        if (equalsInList(builder.toString())) {
-            result = builder.toString();
-            reset();
-        }
     }
 
     public String getResult() {
         String resultCopy = result;
         if (resultCopy == null)
-            resultCopy = "";
+            return "";
         return resultCopy;
     }
 

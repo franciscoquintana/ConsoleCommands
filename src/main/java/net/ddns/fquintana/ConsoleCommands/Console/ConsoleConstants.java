@@ -9,13 +9,6 @@ public final class ConsoleConstants {
 
     public static final char CHAR_BACKSPACE = '\b';
 
-    public static final String IZQUIERDA = "\u001B[D";
-    public static final String DERECHA = "\u001B[C";
-    public static final String ARRIBA = "\u001B[A";
-    public static final String ABAJO = "\u001B[B";
-    public static final String SUPR = "\u001B[3" + (char) 126;
-    public static final String INSERT = "\u001B[2~";
-
     public static final String GOTO_LEFT = "\u001B[1G";
     public static final char CHAR_TAB = '\t';
 

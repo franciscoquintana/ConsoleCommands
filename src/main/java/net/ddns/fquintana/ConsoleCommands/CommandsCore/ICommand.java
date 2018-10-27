@@ -11,9 +11,9 @@ public interface ICommand {
 
     void setParent(CommandMultiple multiple);
 
-    public boolean onCommand(ColoredConsole console, ConsoleArg[] Args) throws ExceptionExtern;
+    public boolean onCommand(ColoredConsole console, String[] Args) throws ExceptionExtern;
 
     public void showHelp(ColoredConsole console);
 
-    List<String> getOptions(ConsoleArg[] args);
+    List<String> getOptions(String[] args);
 }

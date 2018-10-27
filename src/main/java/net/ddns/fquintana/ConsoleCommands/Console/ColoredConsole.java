@@ -5,6 +5,8 @@ import net.ddns.fquintana.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.CommandsCore.ExceptionExtern;
 import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInputEvent;
 import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInvokeEvent;
+import net.ddns.fquintana.ConsoleCommands.Console.Reader.ConsoleRead;
+import net.ddns.fquintana.ConsoleCommands.Console.Reader.KeyConstants;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -72,89 +74,81 @@ public class ColoredConsole {
         String text = "";
         reading = true;
         try {
-            int read;
+            ConsoleRead read;
             currentStr = new StringBuilder();
-            AnsiReader ansiReader = new AnsiReader();
             boolean terminate = false;
             currentDespl = 0;
 
             while(!terminate) {
-                read = RawConsoleInput.read(true);
-                if(read == -1)
-                    read = ConsoleConstants.CHAR_CTRL_D;
-                if(read == '\r')
-                    read = '\n';
+                read = ConsoleRead.read();
 
-                ansiReader.add((char) read);
+                ConsoleInputEvent event = new ConsoleInputEvent( this, read);
 
-                if (!ansiReader.isReading()){
-                    if (!ConsoleUtils.isPrintableChar((char) read)) {
-                        //BORRAR
-                        if(read == ConsoleConstants.CHAR_BACKSPACE || read == 127) {
+                for (Consumer<ConsoleInputEvent> consumerEvent : getEventsInput()){
+                    consumerEvent.accept(event);
+                }
+
+                if(!event.isCancelled())
+                    if (!read.isKey()) {
+                        Character ch = read.getCharacter();
+                        if(ch == ConsoleConstants.CHAR_BACKSPACE) {
                             consoleMovement.deleteOne();
-                        } else if(read == '\n') {
+                        } else if(ch == '\n') {
                             getOut().print('\n');
                             terminate = true;
 
                         }
-                    }
-                    //SUPRIMIR
-                    else if (read == 57427 || ansiReader.getResult().equals(ConsoleConstants.SUPR)) {
-                        if (currentDespl < 0) {
-                            Integer posChar = currentStr.length() + currentDespl;
-                            if (posChar == currentStr.length() - 1) {
-                                getOut().print(' ');
-                                getOut().print(ConsoleConstants.CHAR_BACKSPACE);
-                            } else {
-                                Integer amount = Math.abs(currentDespl);
-                                for (int i = 0; i < amount; i++) {
-                                    getOut().print(' ');
-                                }
-                                getOut().print(ConsoleUtils.left(amount));
-                                write(currentStr.substring(posChar + 1, currentStr.length()), character);
-                                getOut().print(ConsoleUtils.left(amount - 1));
-                            }
-                            currentStr.deleteCharAt(posChar);
-                            currentDespl++;
-                        }
-                    }
-                    //IZQUIERDA
-                    else if (read == 57419 || ansiReader.getResult().equals(ConsoleConstants.IZQUIERDA)) {
-                        consoleMovement.moveOneLeft();
-                    }
-                    //DERECHA
-                    else if (read == 57421 || ansiReader.getResult().equals(ConsoleConstants.DERECHA)) {
-                        consoleMovement.moveOneRight();
-                    }
-                    else if (ansiReader.getResult().equals("")){
-                        if (RawConsoleInput.isStdinIsConsole()) {
-                            write(((Character) (char) read).toString(), character);
+                        else if (RawConsoleInput.isStdinIsConsole()) {
+                            write(ch.toString(), character);
                             String str = currentStr.substring(currentStr.length() + currentDespl, currentStr.length());
                             write(str, character);
                             for (int i = 0; i < str.length(); i++) {
                                 getOut().print(ConsoleConstants.CHAR_BACKSPACE);
                             }
 
-                            currentStr.insert(currentStr.length() + currentDespl, (char) read);
+                            currentStr.insert(currentStr.length() + currentDespl, ch);
                         }
                         else
-                            currentStr.append((char) read);
-
+                            currentStr.append(read);
+                    }
+                    else
+                    {
+                        KeyConstants key = read.getKey();
+                        if (key == KeyConstants.SUPR) {
+                            if (currentDespl < 0) {
+                                int posChar = currentStr.length() + currentDespl;
+                                if (posChar == currentStr.length() - 1) {
+                                    getOut().print(' ');
+                                    getOut().print(ConsoleConstants.CHAR_BACKSPACE);
+                                } else {
+                                    Integer amount = Math.abs(currentDespl);
+                                    for (int i = 0; i < amount; i++) {
+                                        getOut().print(' ');
+                                    }
+                                    getOut().print(ConsoleUtils.left(amount));
+                                    write(currentStr.substring(posChar + 1, currentStr.length()), character);
+                                    getOut().print(ConsoleUtils.left(amount - 1));
+                                }
+                                currentStr.deleteCharAt(posChar);
+                                currentDespl++;
+                            }
+                        }
+                        else if (key == KeyConstants.LEFT_ARROW) {
+                            consoleMovement.moveOneLeft();
+                        }
+                        else if (key == KeyConstants.RIGHT_ARROW) {
+                            consoleMovement.moveOneRight();
+                        }
                     }
 
-                    ConsoleInputEvent event = new ConsoleInputEvent(currentStr, (char) read, ansiReader, this);
-                    for (Consumer<ConsoleInputEvent> consumerEvent : getEventsInput()){
-                        consumerEvent.accept(event);
-                    }
-                    if(event.isShouldCancel())
-                        terminate = true;
                 }
-            }
 
             ConsoleInvokeEvent event = new ConsoleInvokeEvent(currentStr);
+
             for (Consumer<ConsoleInvokeEvent> consumerEvent : getEventsInvoke()){
                 consumerEvent.accept(event);
             }
+
             text = currentStr.toString();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -164,6 +158,10 @@ public class ColoredConsole {
         synchronized (this) {
             notifyAll();
         }
+    }
+
+    public StringBuilder getCurrentStr() {
+        return currentStr;
     }
 
     public void addToCurrent(String str) {
@@ -263,7 +261,5 @@ public class ColoredConsole {
                 currentStr.delete(posChar, posChar + amount);
             }
         }
-
-
     }
 }

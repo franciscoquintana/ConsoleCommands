@@ -34,7 +34,7 @@ public class CommandMultiple implements ICommand {
     }
 
     @Override
-    public boolean onCommand(ColoredConsole console, ConsoleArg[] args) throws ExceptionExtern {
+    public boolean onCommand(ColoredConsole console, String[] args) throws ExceptionExtern {
         if (args.length < minargs){
             try {
                 throw new NotEnoughArgumentsException();
@@ -44,9 +44,9 @@ public class CommandMultiple implements ICommand {
                 return false;
             }
         }
-        if(args.length != 0 && this.getCommands(args[0].getArgStr()) != null) {
-            ConsoleArg argsWhitoutName[] = Arrays.copyOfRange(args,1, args.length);
-            this.getCommands(args[0].getArgStr()).onCommand(console, argsWhitoutName);
+        if(args.length != 0 && this.getCommands(args[0]) != null) {
+            String argsWhitoutName[] = Arrays.copyOfRange(args,1, args.length);
+            this.getCommands(args[0]).onCommand(console, argsWhitoutName);
         } else {
 
             if (cmds.size() == 0)
@@ -85,8 +85,8 @@ public class CommandMultiple implements ICommand {
     }
 
     @Override
-    public List<String> getOptions(ConsoleArg[] args) {
-        String commandName = args[0].getArgStr();
+    public List<String> getOptions(String[] args) {
+        String commandName = args[0];
         if (args.length > 1 && this.getCommands(commandName) != null)
             return this.getCommands(commandName).getOptions(UtilArrays.removeArgs(args, 1));
 

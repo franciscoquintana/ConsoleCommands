@@ -2,6 +2,8 @@ package net.ddns.fquintana.ConsoleCommands.Console;
 
 import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInputEvent;
 import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInvokeEvent;
+import net.ddns.fquintana.ConsoleCommands.Console.Reader.ConsoleRead;
+import net.ddns.fquintana.ConsoleCommands.Console.Reader.KeyConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,34 +117,35 @@ public class ConsoleHistory {
             Boolean undoHis = false;
             Boolean resetHis = true;
 
-            StringBuilder b = consoleInputEvent.getCurrentBuffer();
+            StringBuilder b = consoleInputEvent.getConsole().getCurrentStr();
 
-            char read = consoleInputEvent.getAddedChar();
+            ConsoleRead read = consoleInputEvent.getLastRead();
 
-            if(read == ConsoleConstants.CHAR_CTRL_Z)
+            if (read.isKey()) {
+                if (read.getKey() == KeyConstants.UP_ARROW) {
+                    ConsoleHistory.this.up();
+                    showHis = true;
+                    resetHis = false;
+                }
+                else if (read.getKey() == KeyConstants.DOWN_ARROW) {
+                    ConsoleHistory.this.down();
+                    showHis = true;
+                    resetHis = false;
+                }
+            }
+            else if(read.getCharacter() == ConsoleConstants.CHAR_CTRL_Z)
                 undoHis = true;
-            //ARRIBA
-            else if (read == 57416 || consoleInputEvent.getAnsiReader().getResult().equals(ConsoleConstants.ARRIBA)) {
-                ConsoleHistory.this.up();
-                showHis = true;
-                resetHis = false;
-            }
-            //ABAJO
-            else if (read == 57424|| consoleInputEvent.getAnsiReader().getResult().equals(ConsoleConstants.ABAJO)) {
-                ConsoleHistory.this.down();
-                showHis = true;
-                resetHis = false;
-            }
+
 
             if (previousHis && resetHis)
                 ConsoleHistory.this.setActualNext();
 
             if (showHis || undoHis) {
-                consoleInputEvent.getConsole().consoleMovement.delete(1);
                 String str = undoHis ? ConsoleHistory.this.undo() : ConsoleHistory.this.get();
                 if (str != null) {
                     if (!previousHis)
                         ConsoleHistory.this.setStrRestore(b.toString());
+                    consoleInputEvent.getConsole().consoleMovement.moveRight();
                     consoleInputEvent.getConsole().consoleMovement.delete(b.length());
                     consoleInputEvent.getConsole().addToCurrent(str);
                 }

@@ -19,8 +19,8 @@ public class HelpCommand extends CommandSingle {
     }
 
     @Override
-    public List<String> getOptions(ConsoleArg[] args) {
-        String commandName = args[0].getArgStr();
+    public List<String> getOptions(String[] args) {
+        String commandName = args[0];
         ArrayList<String> options = new ArrayList<>();
         CommandManager manager = CommandManager.getManager();
         if (args.length == 1) {
@@ -40,7 +40,7 @@ public class HelpCommand extends CommandSingle {
 
 
     @Override
-    public boolean run(ColoredConsole console, ConsoleArg[] args) {
+    public boolean run(ColoredConsole console, String[] args) {
         if (args.length == 0)
         {
             Collection<ICommand> Comandos = CommandManager.getManager().getCommands();
@@ -57,15 +57,15 @@ public class HelpCommand extends CommandSingle {
         }
         else
         {
-            ICommand command = CommandManager.getManager().getCommand(args[0].getArgStr());
+            ICommand command = CommandManager.getManager().getCommand(args[0]);
             return showHelp(console, command, UtilArrays.removeArgs(args, 1));
         }
     }
 
-    public boolean showHelp(ColoredConsole console, ICommand command, ConsoleArg[] args) {
+    public boolean showHelp(ColoredConsole console, ICommand command, String[] args) {
         if (args.length != 0 && command instanceof CommandMultiple) {
             CommandMultiple multiple = (CommandMultiple) command;
-            ICommand command1 = multiple.getCommands(args[0].getArgStr());
+            ICommand command1 = multiple.getCommands(args[0]);
             return showHelp(console, command1, UtilArrays.removeArgs(args, 1));
         }
         else {

@@ -10,16 +10,16 @@ import java.util.List;
  * Created by HounterX on 03/01/2018.
  */
 public class UtilArrays {
-    public static ConsoleArg[] removeArgs(ConsoleArg[] args, int amount)
+    public static String[] removeArgs(String[] args, int amount)
     {
-        ConsoleArg[] newArgs;
+        String[] newArgs;
 
         try {
             newArgs = Arrays.copyOfRange(args,amount,args.length);
         }
         catch (Exception ex)
         {
-            newArgs = new ConsoleArg[0];
+            newArgs = new String[0];
         }
 
         return newArgs;

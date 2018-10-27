@@ -4,6 +4,7 @@ import net.ddns.fquintana.ConsoleCommands.Console.Events.ConsoleInputEvent;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
@@ -15,7 +16,7 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
         this.coloredConsole = coloredConsole;
     }
 
-    public abstract List<String> getOptions(ConsoleArg[] args);
+    public abstract List<String> getOptions(String[] args);
 
     private void reset() {
         originalString = null;
@@ -23,7 +24,8 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
     }
 
     //Las opciones deben estar filtradas
-    private void tab(StringBuilder b) {
+    private void tab() {
+        StringBuilder b = coloredConsole.getCurrentStr();
         String str;
         boolean previous = false;
 
@@ -39,7 +41,7 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
         if (str.length() != 0 && str.charAt(str.length()-1) == ' ')
             args.add(new ConsoleArg("", false));
 
-        List<String> opciones = getOptions((ConsoleArg[]) args.toArray());
+        List<String> opciones = getOptions(args.stream().map(ConsoleArg::getArgStr).toArray(size -> new String[size]));
 
         ConsoleArg argCompare = args.get(args.size() - 1);
 
@@ -82,10 +84,13 @@ public abstract class ConsoleTab implements Consumer<ConsoleInputEvent> {
 
     @Override
     public void accept(ConsoleInputEvent consoleInputEvent) {
-        if (consoleInputEvent.getAddedChar() == ConsoleConstants.CHAR_TAB)
-            tab(consoleInputEvent.getCurrentBuffer());
-
-        if (consoleInputEvent.getAddedChar() != ConsoleConstants.CHAR_TAB)
-            reset();
+        if (!consoleInputEvent.getLastRead().isKey()) {
+            if (consoleInputEvent.getLastRead().getCharacter() == ConsoleConstants.CHAR_TAB) {
+                consoleInputEvent.setCancelled(true);
+                tab();
+            }
+            else if (consoleInputEvent.getLastRead().getCharacter() != ConsoleConstants.CHAR_TAB)
+                reset();
+        }
     }
 }
