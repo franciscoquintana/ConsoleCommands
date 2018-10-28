@@ -1,4 +1,4 @@
-package net.ddns.fquintana;
+package net.ddns.fquintana.ConsoleCommands.Console;
 
 public class ChatColor {
     public static final String	RESET				= "\u001B[0m";

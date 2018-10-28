@@ -1,8 +1,7 @@
 package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
-import net.ddns.fquintana.ChatColor;
+import net.ddns.fquintana.ConsoleCommands.Console.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.Console.ColoredConsole;
-import net.ddns.fquintana.ConsoleCommands.Console.ConsoleArg;
 
 import java.util.ArrayList;
 import java.util.List;

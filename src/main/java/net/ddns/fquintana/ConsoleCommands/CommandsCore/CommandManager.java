@@ -1,6 +1,6 @@
 package net.ddns.fquintana.ConsoleCommands.CommandsCore;
 
-import net.ddns.fquintana.ChatColor;
+import net.ddns.fquintana.ConsoleCommands.Console.ChatColor;
 import net.ddns.fquintana.ConsoleCommands.Console.*;
 import net.ddns.fquintana.ConsoleCommands.Utils.UtilArrays;
 

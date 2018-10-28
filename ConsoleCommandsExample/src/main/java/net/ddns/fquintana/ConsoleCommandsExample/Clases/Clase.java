@@ -7,7 +7,7 @@ public class Clase{
 
     private final static String NombreClase = "El nombre de la clase es: %s";
     private final static String NumeroAlumnos = "En esta clase hay: %s alumnos.";
-    private final static String AlumnoInfo = "El alumno es: %s, de la clase %s, su numero de lista es %d";
+    private final static String AlumnoInfo = "El alumno nº%d es: %s, de la clase %s";
 
     private String Nombre;
     private List<Alumno> Alumnos;
@@ -105,9 +105,8 @@ public class Clase{
         for (int i = 1; i <= NumAlumnos; i++)
         {
             Alumno alumno = clase.getAlumno(i);
-            System.out.println(String.format(AlumnoInfo, alumno.getNombre(),alumno.getClase().getNombre(), alumno.getNumLista()));
+            System.out.println(String.format(AlumnoInfo,  alumno.getNumLista(), alumno.getNombre(),alumno.getClase().getNombre()));
         }
-        System.out.println();
 
     }
 
