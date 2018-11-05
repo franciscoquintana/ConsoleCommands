@@ -52,6 +52,8 @@ public class CommandMultiple implements ICommand {
             {
                 console.error("Error");
             }
+            else
+                console.error("Argumento no valido");
 
             showHelp(console);
 

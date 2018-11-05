@@ -31,23 +31,20 @@ public class ConsoleRead {
 
     public static ConsoleRead read() throws IOException {
         char read;
+        UnicodeReader unicodeReader = new UnicodeReader();
         for(;;) {
             read = (char) RawConsoleInput.read(true);
             if (read == '\r')
                 read = '\n';
+            unicodeReader.add(read);
 
-            AnsiReader ansiReader = new AnsiReader();
-            ansiReader.add(read);
-
-            if (!ansiReader.isReading()) {
-                if (!ansiReader.isReading()) {
-                    if (!ansiReader.getResult().equals("")) {
-                        return new ConsoleRead(KeyConstants.getByAnsi(ansiReader.getResult()));
-                    } else if (Character.getType(read) == Character.PRIVATE_USE) {
-                        return new ConsoleRead(KeyConstants.getByWindows(read));
-                    } else {
-                        return new ConsoleRead(read);
-                    }
+            if (!unicodeReader.isReading()) {
+                if (!unicodeReader.getResult().equals("")) {
+                    return new ConsoleRead(KeyConstants.getByUnicode(unicodeReader.getResult()));
+                } else if (Character.getType(read) == Character.PRIVATE_USE) {
+                    return new ConsoleRead(KeyConstants.getByWindows(read));
+                } else {
+                    return new ConsoleRead(read);
                 }
             }
         }

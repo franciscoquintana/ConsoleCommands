@@ -90,7 +90,7 @@ public class ColoredConsole {
                 if(!event.isCancelled())
                     if (!read.isKey()) {
                         Character ch = read.getCharacter();
-                        if(ch == ConsoleConstants.CHAR_BACKSPACE) {
+                        if(ch == ConsoleConstants.CHAR_BACKSPACE || ch == ConsoleConstants.CHAR_BACKSPACE_UNIX) {
                             consoleMovement.deleteOne();
                         } else if(ch == '\n') {
                             getOut().print('\n');
@@ -108,7 +108,7 @@ public class ColoredConsole {
                             currentStr.insert(currentStr.length() + currentDespl, ch);
                         }
                         else
-                            currentStr.append(read);
+                            currentStr.append(read.getCharacter());
                     }
                     else
                     {

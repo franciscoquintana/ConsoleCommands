@@ -8,6 +8,7 @@ public final class ConsoleConstants {
     public static final char CHAR_LEFTBRACKET = '[';
 
     public static final char CHAR_BACKSPACE = '\b';
+    public static final char CHAR_BACKSPACE_UNIX = '\u007F';
 
     public static final String GOTO_LEFT = "\u001B[1G";
     public static final char CHAR_TAB = '\t';

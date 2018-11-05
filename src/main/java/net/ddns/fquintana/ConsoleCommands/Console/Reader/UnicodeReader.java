@@ -5,25 +5,27 @@ import net.ddns.fquintana.ConsoleCommands.Console.ConsoleConstants;
 import java.util.Arrays;
 import java.util.List;
 
-public class AnsiReader {
-    public enum ANSI {DISABLED, READINGBRACKET, READCOMMAND}
-    public ANSI status;
+public class UnicodeReader {
+    public enum UNICODE {DISABLED, READINGBRACKET, READCOMMAND}
+    public UNICODE status;
     public StringBuilder builder;
 
     private String result;
 
-    public AnsiReader() {
-        this.status = ANSI.DISABLED;
+    public UnicodeReader() {
+        this.status = UNICODE.DISABLED;
         this.builder = new StringBuilder();
     }
 
     public void reset() {
-        status = ANSI.DISABLED;
+        status = UNICODE.DISABLED;
         builder = new StringBuilder();
     }
 
     boolean checkFinish() {
         String string = builder.toString();
+        if (string.length() < 3)
+            return false;
         if (Character.isDigit(string.charAt(2)))
             return string.length() == 4;
         return string.length() == 3;
@@ -32,29 +34,28 @@ public class AnsiReader {
 
     public void add(char ch) {
         result = null;
+        builder.append(ch);
         if(ch == ConsoleConstants.CHAR_ESC)
-            status = ANSI.READINGBRACKET;
-        else
-        if (status == ANSI.READINGBRACKET) {
+            status = UNICODE.READINGBRACKET;
+        else if (status == UNICODE.READINGBRACKET) {
             if (ch != ConsoleConstants.CHAR_LEFTBRACKET) {
                 reset();
                 return;
             } else {
-                status = ANSI.READCOMMAND;
+                status = UNICODE.READCOMMAND;
             }
         }
         else
-        if (status == ANSI.READCOMMAND) {
+        if (status == UNICODE.READCOMMAND) {
             if (checkFinish()) {
                 result = builder.toString();
                 reset();
             }
         }
         else
-        if (status == ANSI.DISABLED)
-            return;
-
-        builder.append(ch);
+        if (status == UNICODE.DISABLED) {
+            reset();
+        }
     }
 
     public String getResult() {
@@ -65,6 +66,6 @@ public class AnsiReader {
     }
 
     public boolean isReading() {
-        return status != ANSI.DISABLED;
+        return status != UNICODE.DISABLED;
     }
 }

@@ -12,16 +12,16 @@ public enum KeyConstants {
 
 
     Character chWindows;
-    String ansi;
+    String unicode;
 
-    KeyConstants(Character chWindows, String ansi) {
+    KeyConstants(Character chWindows, String unicode) {
         this.chWindows = chWindows;
-        this.ansi = ansi;
+        this.unicode = unicode;
     }
 
-    public static KeyConstants getByAnsi(String ansi) {
+    public static KeyConstants getByUnicode(String unicode) {
         for (KeyConstants keyConstant : values()) {
-            if (keyConstant.ansi.equals(ansi))
+            if (keyConstant.unicode.equals(unicode))
                 return keyConstant;
         }
         return UNKNOWN;
