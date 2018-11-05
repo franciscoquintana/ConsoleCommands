@@ -56,9 +56,9 @@ public abstract class CommandSingle implements ICommand {
             }
         }
 
-        String helper = isSubCommand() ? parentCmd.helper() : "";
+        //String helper = isSubCommand() ? parentCmd.helper() : "";
 
-        console.error ("Uso incorrecto: " + helper +  this.helper());
+        console.error ("Uso incorrecto: " +  this.helper());
 
         return true;
     }
